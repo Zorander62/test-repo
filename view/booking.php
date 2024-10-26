@@ -1,4 +1,3 @@
-
         <!-- Top Header Start -->
         <section class="banner-header">
             <div class="container text-center">
@@ -31,53 +30,66 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="booking-form">
-                                <form>
-                                    <div class="form-row">
-                                        <div class="control-group col-sm-6">
-                                            <label>First Name</label>
-                                            <input type="text" class="form-control" placeholder="E.g. John Sina" required="required" />
+                               <!-- view/booking.php -->
+                                    <form method="post" action="?a=process_booking">
+                                        <div class="form-row">
+                                            <div class="control-group col-sm-6">
+                                                <label>First Name</label>
+                                                <input type="text" name="first_name" class="form-control" placeholder="E.g. John Sina" required="required" />
+                                            </div>
+                                            <div class="control-group col-sm-6">
+                                                <label>Last Name</label>
+                                                <input type="text" name="last_name" class="form-control" placeholder="E.g. Doe" required="required" />
+                                            </div>
                                         </div>
-                                        <div class="control-group col-sm-6">
-                                            <label>Email</label>
-                                            <input type="email" class="form-control" placeholder="E.g. email@example.com" required="required" />
+                                        <div class="form-row">
+                                            <div class="control-group col-sm-6">
+                                                <label>Mobile</label>
+                                                <input type="text" name="mobile" class="form-control" placeholder="E.g. +1 234 567 8900" required="required" />
+                                            </div>
+                                            <div class="control-group col-sm-6">
+                                                <label>Email</label>
+                                                <input type="email" name="email" class="form-control" placeholder="E.g. email@example.com" required="required" />
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="control-group col-sm-6">
-                                            <label>Mobile</label>
-                                            <input type="text" class="form-control" placeholder="E.g. +1 234 567 8900" required="required" />
+                                        <div class="form-row">
+                                            <div class="control-group col-sm-6">
+                                                <label>Birth Date</label>
+                                                <input type="date" name="birth_date" class="form-control" required="required" />
+                                            </div>
+                                            <div class="control-group col-sm-6">
+                                                <label>Select a Service</label>
+                                                <select name="service" class="custom-select" required>
+                                                    <option value="">Consultation</option>
+                                                    <option>Health Checkup</option>
+                                                    <option>Flu Shots</option>
+                                                    <option>Blood Test</option>
+                                                    <option>Physical Exams</option>
+                                                    <option>Prevention</option>
+                                                    <option>Family Planning</option>
+                                                    <option>Home Visits</option>
+                                                    <option>Insurance</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                        <div class="control-group col-sm-6">
-                                            <label>Select a Service</label>
-                                            <select class="custom-select">
-                                                <option value="">Consultation</option>
-                                                <option>Health Checkup</option>
-                                                <option>Flu Shots</option>
-                                                <option>Blood Test</option>
-                                                <option>Physical Exams</option>
-                                                <option>Prevention</option>
-                                                <option>Family Planning</option>
-                                                <option>Home Visits</option>
-                                                <option>Insurance</option>
-                                            </select>
+                                        <div class="form-row">
+                                            <div class="control-group col-sm-6">
+                                                <label>Appointment Date</label>
+                                                <input type="date" name="appointment_date" class="form-control" required="required" />
+                                            </div>
+                                            <div class="control-group col-sm-6">
+                                                <label>Appointment Time</label>
+                                                <input type="time" name="appointment_time" class="form-control" required="required" />
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="control-group col-sm-6">
-                                            <label>Appointment Date</label>
-                                            <input type="text" class="form-control datetimepicker-input" id="date" data-toggle="datetimepicker" data-target="#date" placeholder="E.g. MM/DD/YYYY" required="required" />
+                                        <div class="control-group">
+                                            <label>Special Request</label>
+                                            <textarea name="special_request" class="form-control" placeholder="E.g. Special Request"></textarea>
                                         </div>
-                                        <div class="control-group col-sm-6">
-                                            <label>Appointment Time</label>
-                                            <input type="text" class="form-control datetimepicker-input" id="time" data-toggle="datetimepicker" data-target="#time" placeholder="E.g. HH:MM AM" required="required" />
+                                        <div class="button float-right mt-3">
+                                            <button type="submit">Book Now</button>
                                         </div>
-                                    </div>
-                                    <div class="control-group">
-                                        <label>Special Request</label>
-                                        <input type="text" class="form-control" placeholder="E.g. Special Request" required="required" />
-                                    </div>
-                                    <div class="button"><button type="submit">Book Now</button></div>
-                                </form>
+                                    </form>
                             </div>
                         </div>
                     </div>

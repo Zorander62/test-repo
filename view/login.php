@@ -1,10 +1,9 @@
-
         <!-- Top Header Start -->
         <section class="banner-header">
             <div class="container text-center">
                 <div class="row">
                     <div class="col-md-12">
-                        <h1><a href="index.html">Dr. Johnson</a></h1>
+                        <h1><a href="?a=home">Dr. Johnson</a></h1>
                         <!-- <a class="brand" href="index.html" title="Home"><img alt="Logo" src="img/logo.png"></a> -->
                     </div>
                 </div>
@@ -22,6 +21,52 @@
 
 		<main id="main">
 
+		<?php
+//session_start(); // Start the session
+require_once "model/function.php"; // Include your database functions
+$db = new mainClass(); // Create an instance of your database class
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Retrieve form data
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    // Validate user credentials
+    $stmt = $db->prepare("SELECT user_id, password FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 1) {
+        $user = $result->fetch_assoc();
+        
+        // Verify the password
+        if (password_verify($password, $user['password'])) {
+            // Password is correct, set session variables
+            $_SESSION['user_id'] = $user['user_id'];
+            $_SESSION['email'] = $email; // Store email in session if needed
+			
+            // Redirect to the User folder
+            //header("Location: User/index.php");
+            echo '<script>
+            swal("Success", "Your appointment has been booked successfully.", "success")
+            .then((value) => {
+                window.location.href = "User/index.php";
+            });
+          </script>';
+            exit();
+        } else {
+            //echo "Invalid password.";
+            echo '<script>swal("Warning","Invalid password.","warning")</script>';
+        }
+    } else {
+        echo '<script>swal("Warning","No user found with that email.","warning")</script>';
+        //echo "No user found with that email.";
+    }
+} 
+
+?>
+
 			<!-- Login Section Start -->
 			<section id="login">
 				<div class="container">
@@ -29,50 +74,30 @@
 						<h3>Login</h3>
 					</div>
 					<div class="row">
-						<div class="col-md-6 form">
-							<form>
-								<div class="form-row">
-									<div class="form-group col-md-6">
-										<input type="text" class="form-control" placeholder="Your Name" />
-									</div>
-									<div class="form-group col-md-6">
-										<input type="email" class="form-control" placeholder="Your Email" />
-									</div>
-								</div>
-								<div class="form-row">
-									<div class="form-group col-md-6">
-										<input type="password" class="form-control" placeholder="Your Password" />
-									</div>
-									<div class="form-group col-md-6">
-										<input type="Password" class="form-control" placeholder="Repeat Your Password" />
-									</div>
-								</div>
-								<div class="form-group">
-									<div class="custom-control custom-checkbox">
-										<input type="checkbox" class="custom-control-input" id="remember1">
-										<label class="custom-control-label" for="remember1">Remember me</label>
-									</div>
-								</div>
-								<div><button type="submit">Sing Up</button></div>
-							</form>
+						<div class="col-md-3 form">
+							
 						</div>
 						
 						<div class="col-md-6 form">
-							<form>
+							<form method="post">
 								<div class="form-group">
-									<input type="email" class="form-control" placeholder="Your Email" />
+									<input type="email" name="email" class="form-control" placeholder="Your Email" required />
 								</div>
 								<div class="form-group">
-									<input type="password" class="form-control" placeholder="Your Password" />
+									<input type="password" name="password" class="form-control" placeholder="Your Password" required />
 								</div>
 								<div class="form-group">
 									<div class="custom-control custom-checkbox">
 										<input type="checkbox" class="custom-control-input" id="remember2">
-										<label class="custom-control-label" for="remember2">Remember me</label>
+											<label class="custom-control-label" for="remember2">Remember me</label>
 									</div>
 								</div>
 								<div><button type="submit">Sign In</button></div>
 							</form>
+						</div>
+
+						<div class="col-md-3 form">
+							
 						</div>
 					</div>
 				</div>

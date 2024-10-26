@@ -4,8 +4,8 @@
           <div class="card">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
-                <p class="mb-0">Billing</p>
-                <button class="btn btn-primary btn-sm ms-auto">Billing</button>
+                <p class="mb-0">Check Result</p>
+                <button class="btn btn-primary btn-sm ms-auto">Check Result</button>
               </div>
             </div>
 

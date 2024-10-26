@@ -33,6 +33,7 @@ $Fcall = new mainClass();
 <html lang="en">
     
         <?php require_once "view/includes/header.php"; ?>
+        <script type="text/javascript" src="sweetalert.min.js"></script>
     <body>
         <!-- Top Header Start -->
        

@@ -9,7 +9,7 @@
 
                 <div class="col-md-12">
                     <h2>SUNRISE MEDICAL CLINIC</h2>
-                    <a class="btn btn-full" href="booking.html">Book an Appointment</a>
+                    <a class="btn btn-full" href="?a=booking">Book an Appointment</a>
                 </div>
             </div>
         </section>

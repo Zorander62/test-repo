@@ -21,32 +21,76 @@ class mainClass {
         }
     }
 
-    // Login function
-    public function login($email, $password) {
-
-        $email = mysqli_real_escape_string($this->conn, $email);
-        $sql = "SELECT id, password, name, role FROM users WHERE email = ?";
-        $stmt = mysqli_prepare($this->conn, $sql);
-        mysqli_stmt_bind_param($stmt, "s", $email);
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
-
-        if ($row = mysqli_fetch_assoc($result)) {
-            if (password_verify($password, $row['password'])) {
-                // Password is correct, start a new session
-                $_SESSION['name'] = $row['name'];
-                $_SESSION['user_id'] = $row['id'];
-                $_SESSION['role'] = $row['role'];
-                $_SESSION['email'] = $email;
-                return true;
-            }
-        }
-
-        return false;
-
+    
+    public function prepare($query) {
+        return $this->conn->prepare($query);
     }
 
 
+
+
+    public function insertUser($username, $password, $email, $role = 'patient') {
+        $getpass = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $this->conn->prepare("INSERT INTO users (username, password, email, role, created_at) VALUES (?, ?, ?, ?, NOW())");
+        $stmt->bind_param("ssss", $username, $getpass, $email, $role);
+        
+        if ($stmt->execute()) {
+            return $this->conn->insert_id; // Return the last inserted user_id
+        } else {
+            // Handle error
+            echo "Error inserting user: " . $stmt->error; // Print error for debugging
+            return false;
+        }
+    }
+    
+    function insertPatient($user_id, $first_name, $last_name, $birth_date, $mobile, $email) {
+        $stmt = $this->conn->prepare("INSERT INTO patients (user_id, first_name, last_name, date_of_birth, phone_number, email) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("isssss", $user_id, $first_name, $last_name, $birth_date, $mobile, $email);
+        $stmt->execute();
+    }
+    
+    function getPatientByUserId($user_id) {
+        $stmt = $this->conn->prepare("SELECT patient_id FROM patients WHERE user_id = ?");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_assoc(); // Return the patient record or false if not found
+    }
+    
+    function insertAppointment($patient_id, $appointment_date) {
+        $stmt = $this->conn->prepare("INSERT INTO appointments (patient_id, appointment_date, status, created_at) VALUES (?, ?, 'scheduled', NOW())");
+        $stmt->bind_param("is", $patient_id, $appointment_date);
+        $stmt->execute();
+    }
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
 
     // Process payment function
     public function processPayment($student_id, $amount, $payment_method) {
@@ -70,6 +114,25 @@ class mainClass {
 
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1623,59 +1686,6 @@ public function applyForRoom($reg_number, $room_type, $preferences) {
 
 
 
-public function registerCourses($regNo, $session, $level, $address, $semester, $total_units, $date, $courses) {
-    // Update student information
-    $updateSuccess = $this->updateStudentInfo($regNo, $session, $level, $address, $semester, $total_units, $date);
-
-    if (!$updateSuccess) {
-        return false;
-    }
-
-    // Insert course registrations
-    foreach ($courses as $course) {
-        $courseCode = htmlspecialchars($course['code']);
-        $courseTitle = htmlspecialchars($course['title']);
-        $courseUnit = (int) $course['unit'];
-
-        $insertSuccess = $this->insertCourseRegistration($regNo, $courseCode, $courseTitle, $courseUnit);
-
-        if (!$insertSuccess) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-
-    public function insertCourseRegistration($student_id, $course_code, $course_title, $course_unit) {
-        $sql = "INSERT INTO course_registrations (regno, course_code, course_title, course_unit) VALUES (?, ?, ?, ?)";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("ssss", $student_id, $course_code, $course_title, $course_unit);
-        $stmt->execute();
-    }
-
-    // public function updateTotalUnits($student_id, $total_units) {
-    //     $sql = "UPDATE student_info SET total_units = ? WHERE id = ?";
-    //     $stmt = $this->conn->prepare($sql);
-    //     $stmt->bind_param("ii", $total_units, $student_id);
-    //     $stmt->execute();
-    // }
-
-    // New method for admin to view registered courses
-    public function getRegisteredCourses($student_id) {
-        $sql = "SELECT * FROM course_registrations WHERE student_id = ?";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("i", $student_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        return $result->fetch_all(MYSQLI_ASSOC);
-    }
-
-
-
-
-
 
 
 
@@ -1871,4 +1881,8 @@ function __destruct() {
     }
 
 }
+
+// public function close() {
+//     $this->conn->close();
+// }
 ?>

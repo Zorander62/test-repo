@@ -7,7 +7,7 @@
 // } 
 
 //require_once '../model/function.php'; 
-require_once 'model/function.php'; 
+require_once '../model/function.php'; 
 $Fcall = new mainClass();
 
 // $user = $_SESSION['name'];
@@ -24,48 +24,47 @@ switch ($action) {
 
     case 'home':
         // Home action
-        require_once 'view/dasboard.php';
+        require_once 'pages/dashboard.php';
         break;
 
 
-        case 'about':
+        case 'profile':
             // Home action
-            require_once 'view/about.php';
+            require_once 'pages/profile.php';
             break;
 
 
-        case 'service':
+        case 'appointment':
             // Home action
-            require_once 'view/service.php';
+            require_once 'pages/appointment.php';
             break;
 
 
 
-            case 'booking':
+            case 'cancel_apointment':
                 // Home action
-                require_once 'view/booking.php';
+                require_once 'pages/cancel_apointment.php';
                 break;
 
 
-                case 'contact':
+                case 'billing':
                     // Home action
-                    require_once 'view/contact.php';
+                    require_once 'pages/billing.php';
                     break;
 
 
-                    case 'login':
+                    case 'check_result':
                         // Home action
-                        require_once 'view/login.php';
+                        require_once 'pages/check_result.php';
                         break;
 
             
-
-
+                
 
 
         default:
 
-        require_once 'view/dasboard.php';
+        require_once 'pages/dashboard.php';
          break;
  }
  ?>

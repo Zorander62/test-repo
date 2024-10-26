@@ -8,14 +8,14 @@
 
 //require_once '../model/function.php'; 
 require_once 'model/function.php'; 
-$Fcall = new mainClass();
+$db = new mainClass();
 
 // $user = $_SESSION['name'];
 // $user_role = $_SESSION['role'];
-$os=$Fcall->get_OS();
-$ip=$Fcall->get_ip();
-$browser=$Fcall->get_Browser();
-$device=$Fcall->get_Device();
+$os=$db->get_OS();
+$ip=$db->get_ip();
+$browser=$db->get_Browser();
+$device=$db->get_Device();
 $date=date("Y-m-d H:m:s");
 
 $action = isset($_GET['a']) ? $_GET['a'] : 'default';
@@ -36,12 +36,15 @@ switch ($action) {
 
         case 'service':
             // Home action
+
+            
+
             require_once 'view/service.php';
             break;
 
 
-
             case 'booking':
+               
                 // Home action
                 require_once 'view/booking.php';
                 break;
@@ -58,7 +61,34 @@ switch ($action) {
                         require_once 'view/login.php';
                         break;
 
-            
+
+                        case 'signup':
+
+                            
+                            // Home action
+                            require_once 'view/signup.php';
+                            break;
+
+                        
+                            case 'process_booking':
+                                // Home action
+                                require_once 'view/process_booking.php';
+                                break;
+                                
+
+                            case 'process_login':
+                                // Home action
+                                require_once 'view/process_login.php';
+                                break;
+
+
+                            case 'success':
+                                // Home action
+                                require_once 'view/success.php';
+                                break;
+        
+
+                                
 
 
 
