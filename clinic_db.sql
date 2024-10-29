@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 28, 2024 at 09:11 AM
+-- Generation Time: Oct 29, 2024 at 10:18 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.12
 
@@ -32,6 +32,7 @@ CREATE TABLE `appointments` (
   `patient_id` int(11) NOT NULL,
   `doctor_id` int(11) NOT NULL,
   `appointment_date` datetime NOT NULL,
+  `special_request` text DEFAULT NULL,
   `status` enum('scheduled','completed','canceled') DEFAULT 'scheduled',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -40,10 +41,10 @@ CREATE TABLE `appointments` (
 -- Dumping data for table `appointments`
 --
 
-INSERT INTO `appointments` (`appointment_id`, `patient_id`, `doctor_id`, `appointment_date`, `status`, `created_at`) VALUES
-(2, 2, 0, '2024-10-26 16:00:00', 'scheduled', '2024-10-26 14:27:30'),
-(3, 3, 0, '2024-10-26 17:32:00', 'scheduled', '2024-10-26 14:33:32'),
-(4, 4, 0, '2024-10-26 18:34:00', 'scheduled', '2024-10-26 15:36:34');
+INSERT INTO `appointments` (`appointment_id`, `patient_id`, `doctor_id`, `appointment_date`, `special_request`, `status`, `created_at`) VALUES
+(2, 2, 0, '2024-10-26 16:00:00', NULL, 'scheduled', '2024-10-26 14:27:30'),
+(3, 3, 0, '2024-10-26 17:32:00', NULL, 'scheduled', '2024-10-26 14:33:32'),
+(4, 4, 0, '2024-10-26 18:34:00', NULL, 'scheduled', '2024-10-26 15:36:34');
 
 -- --------------------------------------------------------
 
@@ -66,10 +67,12 @@ CREATE TABLE `appointment_history` (
 
 CREATE TABLE `billing` (
   `billing_id` int(11) NOT NULL,
-  `appointment_id` int(11) NOT NULL,
+  `patient_id` int(11) NOT NULL,
+  `service` varchar(100) NOT NULL,
   `amount` decimal(10,2) NOT NULL,
-  `payment_status` enum('paid','unpaid') DEFAULT 'unpaid',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `status` enum('paid','unpaid') DEFAULT 'unpaid',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -158,6 +161,21 @@ CREATE TABLE `medical_history` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `medical_records`
+--
+
+CREATE TABLE `medical_records` (
+  `record_id` int(11) NOT NULL,
+  `patient_id` int(11) NOT NULL,
+  `doctor_id` int(11) NOT NULL,
+  `description` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `notifications`
 --
 
@@ -181,19 +199,24 @@ CREATE TABLE `patients` (
   `first_name` varchar(50) NOT NULL,
   `last_name` varchar(50) NOT NULL,
   `date_of_birth` date DEFAULT NULL,
+  `gender` varchar(255) DEFAULT NULL,
   `phone_number` varchar(15) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
-  `address` text DEFAULT NULL
+  `address` text DEFAULT NULL,
+  `city` varchar(255) DEFAULT NULL,
+  `country` varchar(255) DEFAULT NULL,
+  `insurance_provider` varchar(255) DEFAULT NULL,
+  `insurance_policy_number` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `patients`
 --
 
-INSERT INTO `patients` (`patient_id`, `user_id`, `first_name`, `last_name`, `date_of_birth`, `phone_number`, `email`, `address`) VALUES
-(2, 4, 'Collins', 'Mina', '1995-10-26', '08164528072', 'webworksofficial1@gmail.com', NULL),
-(3, 5, 'Destiny', 'Mark', '2024-10-26', '09150808546', 'nimbleshop375@gmail.com', NULL),
-(4, 6, 'Micheal', 'bode', '2024-10-26', '09072979133', 'pcolman128@gmail.com', NULL);
+INSERT INTO `patients` (`patient_id`, `user_id`, `first_name`, `last_name`, `date_of_birth`, `gender`, `phone_number`, `email`, `address`, `city`, `country`, `insurance_provider`, `insurance_policy_number`) VALUES
+(2, 4, 'Collins', 'Mina', '1995-10-26', NULL, '08164528072', 'webworksofficial1@gmail.com', NULL, NULL, NULL, NULL, NULL),
+(3, 5, 'Destiny', 'Mark', '2024-10-26', NULL, '09150808546', 'nimbleshop375@gmail.com', NULL, NULL, NULL, NULL, NULL),
+(4, 6, 'Micheal', 'bode', '2024-10-26', NULL, '09072979133', 'pcolman128@gmail.com', NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -231,10 +254,13 @@ CREATE TABLE `pharmacy` (
 
 CREATE TABLE `prescriptions` (
   `prescription_id` int(11) NOT NULL,
-  `appointment_id` int(11) NOT NULL,
-  `medicine_id` int(11) NOT NULL,
-  `dosage` varchar(100) NOT NULL,
-  `instructions` text DEFAULT NULL
+  `patient_id` int(11) NOT NULL,
+  `doctor_id` int(11) NOT NULL,
+  `medication_name` varchar(100) NOT NULL,
+  `dosage` varchar(50) NOT NULL,
+  `instructions` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -269,10 +295,12 @@ CREATE TABLE `staff` (
 
 CREATE TABLE `test_results` (
   `result_id` int(11) NOT NULL,
-  `appointment_id` int(11) NOT NULL,
-  `test_id` int(11) NOT NULL,
-  `result` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `patient_id` int(11) NOT NULL,
+  `test_name` varchar(100) NOT NULL,
+  `result` text NOT NULL,
+  `test_date` date NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -346,7 +374,7 @@ ALTER TABLE `appointment_history`
 --
 ALTER TABLE `billing`
   ADD PRIMARY KEY (`billing_id`),
-  ADD KEY `appointment_id` (`appointment_id`);
+  ADD KEY `patient_id` (`patient_id`);
 
 --
 -- Indexes for table `doctors`
@@ -389,6 +417,14 @@ ALTER TABLE `medical_history`
   ADD KEY `patient_id` (`patient_id`);
 
 --
+-- Indexes for table `medical_records`
+--
+ALTER TABLE `medical_records`
+  ADD PRIMARY KEY (`record_id`),
+  ADD KEY `patient_id` (`patient_id`),
+  ADD KEY `doctor_id` (`doctor_id`);
+
+--
 -- Indexes for table `notifications`
 --
 ALTER TABLE `notifications`
@@ -421,8 +457,8 @@ ALTER TABLE `pharmacy`
 --
 ALTER TABLE `prescriptions`
   ADD PRIMARY KEY (`prescription_id`),
-  ADD KEY `appointment_id` (`appointment_id`),
-  ADD KEY `medicine_id` (`medicine_id`);
+  ADD KEY `patient_id` (`patient_id`),
+  ADD KEY `doctor_id` (`doctor_id`);
 
 --
 -- Indexes for table `reception`
@@ -443,8 +479,7 @@ ALTER TABLE `staff`
 --
 ALTER TABLE `test_results`
   ADD PRIMARY KEY (`result_id`),
-  ADD KEY `appointment_id` (`appointment_id`),
-  ADD KEY `test_id` (`test_id`);
+  ADD KEY `patient_id` (`patient_id`);
 
 --
 -- Indexes for table `users`
@@ -528,6 +563,12 @@ ALTER TABLE `medical_history`
   MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `medical_records`
+--
+ALTER TABLE `medical_records`
+  MODIFY `record_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
@@ -607,7 +648,7 @@ ALTER TABLE `appointment_history`
 -- Constraints for table `billing`
 --
 ALTER TABLE `billing`
-  ADD CONSTRAINT `billing_ibfk_1` FOREIGN KEY (`appointment_id`) REFERENCES `appointments` (`appointment_id`);
+  ADD CONSTRAINT `billing_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`patient_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `feedback`
@@ -621,6 +662,13 @@ ALTER TABLE `feedback`
 --
 ALTER TABLE `medical_history`
   ADD CONSTRAINT `medical_history_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`patient_id`);
+
+--
+-- Constraints for table `medical_records`
+--
+ALTER TABLE `medical_records`
+  ADD CONSTRAINT `medical_records_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`patient_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `medical_records_ibfk_2` FOREIGN KEY (`doctor_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `notifications`
@@ -645,8 +693,8 @@ ALTER TABLE `patient_insurance`
 -- Constraints for table `prescriptions`
 --
 ALTER TABLE `prescriptions`
-  ADD CONSTRAINT `prescriptions_ibfk_1` FOREIGN KEY (`appointment_id`) REFERENCES `appointments` (`appointment_id`),
-  ADD CONSTRAINT `prescriptions_ibfk_2` FOREIGN KEY (`medicine_id`) REFERENCES `pharmacy` (`medicine_id`);
+  ADD CONSTRAINT `prescriptions_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`patient_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `prescriptions_ibfk_2` FOREIGN KEY (`doctor_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `reception`
@@ -664,8 +712,7 @@ ALTER TABLE `staff`
 -- Constraints for table `test_results`
 --
 ALTER TABLE `test_results`
-  ADD CONSTRAINT `test_results_ibfk_1` FOREIGN KEY (`appointment_id`) REFERENCES `appointments` (`appointment_id`),
-  ADD CONSTRAINT `test_results_ibfk_2` FOREIGN KEY (`test_id`) REFERENCES `lab_tests` (`test_id`);
+  ADD CONSTRAINT `test_results_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`patient_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `user_role_assignments`
