@@ -64,7 +64,96 @@ class mainClass {
     
 
 
+    function Targeted_information($table, $field, $data) {
+        // Prepare the SQL statement with placeholders
+        $sql = "SELECT * FROM $table WHERE $field = ?";
+        
+        // Prepare the statement
+        $stmt = $this->conn->prepare($sql);
+        
+        // Check if the statement was prepared successfully
+        if ($stmt === false) {
+            // Handle error
+            echo "Error preparing statement: " . $this->conn->error;
+            return false;
+        }
+    
+        // Bind the parameter
+        $stmt->bind_param("s", $data); // Assuming $data is a string. Change "s" to "i" for integers, etc.
+    
+        // Execute the statement
+        $stmt->execute();
+    
+        // Get the result
+        $result = $stmt->get_result();
+    
+        // Fetch the row
+        $row = $result->fetch_array(MYSQLI_ASSOC); // Fetch as an associative array
+    
+        // Close the statement
+        $stmt->close();
+    
+        // Return the row or false if no row was found
+        return $row ? $row : false;
+    }
+    
 
+
+     // Function to insert an appointment
+     public function insertAppointment2($patient_id, $appointment_date, $special_request = null) {
+        $stmt = $this->conn->prepare("INSERT INTO appointments (patient_id, appointment_date, special_request, status, created_at) VALUES (?, ?, ?, 'scheduled', NOW())");
+        $stmt->bind_param("iss", $patient_id, $appointment_date, $special_request);
+        
+        if ($stmt->execute()) {
+            return $this->conn->insert_id; // Return the last inserted appointment_id
+        } else {
+            echo "Error inserting appointment: " . $stmt->error;
+            return false;
+        }
+    }
+
+    // Function to cancel an appointment
+    public function cancelAppointment($appointment_id) {
+        $stmt = $this->conn->prepare("UPDATE appointments SET status = 'canceled' WHERE appointment_id = ?");
+        $stmt->bind_param("i", $appointment_id);
+        
+        if ($stmt->execute()) {
+            return true; // Appointment canceled successfully
+        } else {
+            echo "Error canceling appointment: " . $stmt->error;
+            return false;
+        }
+    }
+
+    // Function to get appointments by user ID
+    public function getAppointmentsByUserId($user_id) {
+        $stmt = $this->conn->prepare("SELECT a.appointment_id, a.appointment_date, a.special_request, a.status FROM appointments a JOIN patients p ON a.patient_id = p.patient_id WHERE p.user_id = ?");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        return $result->fetch_all(MYSQLI_ASSOC); // Return all appointments as an associative array
+    }
+
+    // Function to get billing information by user ID
+    public function getBillingInfoByUserId($user_id) {
+        $stmt = $this->conn->prepare("SELECT service, amount, status FROM billing WHERE user_id = ?");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        return $result->fetch_all(MYSQLI_ASSOC); // Return all billing info as an associative array
+    }
+
+    // Function to get results by user ID
+    public function getResultsByUserId($user_id) {
+        $stmt = $this->conn->prepare("SELECT test_name, test_date, result FROM results r JOIN patients p ON r.patient_id = p.patient_id WHERE p.user_id = ?");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        return $result->fetch_all(MYSQLI_ASSOC); // Return all results as an associative array
+    }
 
 
 

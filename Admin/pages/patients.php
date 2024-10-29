@@ -19,24 +19,36 @@
           <div class="card">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
-                <p class="mb-0">Create Appointment</p>
-                <button class="btn btn-primary btn-sm ms-auto">View Appointments</button>
+                <p class="mb-0">Manage Patients</p>
+                <button class="btn btn-primary btn-sm ms-auto">New Patients</button>
               </div>
             </div>
 
             <div class="card-body p-4 ">
 
-            <form action="" method="post">
-            <div class="form-group">
-                <label for="appointment_date">Appointment Date:</label>
-                <input type="datetime-local" name="appointment_date" class="form-control" required>
+          
+          
+              <div class="table-responsive p-5">
+              
+                <table class="table align-items-center mb-0"><
+
+      
+            <thead>
+                <tr>
+                <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+               
+            </tbody>
+        </table>
             </div>
-            <div class="form-group">
-                <label for="special_request">Special Request:</label>
-                <textarea name="special_request" class="form-control"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Create Appointment</button>
-        </form>
+
+
+
 
 </div>
 

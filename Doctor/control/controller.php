@@ -24,38 +24,38 @@ switch ($action) {
 
     case 'home':
         // Home action
-        require_once 'view/dasboard.php';
+        require_once 'pages/dashboard.php';
         break;
 
 
         case 'about':
             // Home action
-            require_once 'view/about.php';
+            require_once 'pages/about.php';
             break;
 
 
         case 'service':
             // Home action
-            require_once 'view/service.php';
+            require_once 'pages/service.php';
             break;
 
 
 
             case 'booking':
                 // Home action
-                require_once 'view/booking.php';
+                require_once 'pages/booking.php';
                 break;
 
 
                 case 'contact':
                     // Home action
-                    require_once 'view/contact.php';
+                    require_once 'pages/contact.php';
                     break;
 
 
                     case 'login':
                         // Home action
-                        require_once 'view/login.php';
+                        require_once 'pages/login.php';
                         break;
 
             
@@ -65,7 +65,7 @@ switch ($action) {
 
         default:
 
-        require_once 'view/dasboard.php';
+        require_once 'pages/dashboard.php';
          break;
  }
  ?>

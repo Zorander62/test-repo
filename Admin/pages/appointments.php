@@ -26,17 +26,31 @@
 
             <div class="card-body p-4 ">
 
-            <form action="" method="post">
-            <div class="form-group">
-                <label for="appointment_date">Appointment Date:</label>
-                <input type="datetime-local" name="appointment_date" class="form-control" required>
+          
+          
+              <div class="table-responsive p-5">
+              
+                <table class="table align-items-center mb-0"><
+
+      
+            <thead>
+                <tr>
+                <th>Patient</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Status</th>
+            <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+        
+            </tbody>
+        </table>
             </div>
-            <div class="form-group">
-                <label for="special_request">Special Request:</label>
-                <textarea name="special_request" class="form-control"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Create Appointment</button>
-        </form>
+
+
+
 
 </div>
 

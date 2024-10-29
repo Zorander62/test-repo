@@ -28,34 +28,34 @@ switch ($action) {
         break;
 
 
-        case 'about':
+        case 'appointments':
             // Home action
-            require_once 'view/about.php';
+            require_once 'pages/appointments.php';
             break;
 
 
-        case 'service':
+        case 'patients':
             // Home action
-            require_once 'pages/service.php';
+            require_once 'pages/patients.php';
             break;
 
 
 
-            case 'booking':
+            case 'settings':
                 // Home action
-                require_once 'pages/booking.php';
+                require_once 'pages/settings.php';
                 break;
 
 
-                case 'contact':
+                case 'reports':
                     // Home action
-                    require_once 'pages/contact.php';
+                    require_once 'pages/reports.php';
                     break;
 
 
-                    case 'login':
+                    case 'billing':
                         // Home action
-                        require_once 'pages/login.php';
+                        require_once 'pages/billing.php';
                         break;
 
             
