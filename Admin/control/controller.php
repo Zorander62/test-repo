@@ -7,7 +7,7 @@
 // } 
 
 //require_once '../model/function.php'; 
-require_once 'model/function.php'; 
+require_once '../model/function.php'; 
 $Fcall = new mainClass();
 
 // $user = $_SESSION['name'];
@@ -40,6 +40,12 @@ switch ($action) {
             break;
 
 
+            case 'add_user':
+                // Home action
+                require_once 'pages/add_user.php';
+                break;
+           
+
 
             case 'settings':
                 // Home action
@@ -58,8 +64,13 @@ switch ($action) {
                         require_once 'pages/billing.php';
                         break;
 
-            
 
+                        case 'user_management':
+                            // Home action
+                            require_once 'pages/user_management.php';
+                            break;
+            
+                 
 
 
 

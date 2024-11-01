@@ -1,8 +1,7 @@
 <?php
 
 
-//$patient_id = $_GET['id']; // Get patient ID from URL
-//$billing_info = $db->getBillingInfoByPatientId($patient_id); // Assuming this function exists
+//$reports = $db->getReports(); // Assuming this function exists
 ?>
 
 
@@ -13,7 +12,7 @@
           <div class="card">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
-                <p class="mb-0">Manage Prescriptions</p>
+                <p class="mb-0">Reports</p>
                 
               </div>
             </div>
@@ -27,17 +26,17 @@
               <table class="table">
             <thead>
                 <tr>
-                    <th>Service</th>
-                    <th>Amount</th>
-                    <th>Status</th>
+                    <th>Report Type</th>
+                    <th>Date</th>
+                    <th>Details</th>
                 </tr>
             </thead>
             <tbody>
-                <?php //foreach ($billing_info as $bill): ?>
+                <?php // ($reports as $report): ?>
                     <tr>
-                        <td><?php //echo $bill['service']; ?></td>
-                        <td>$<?php //echo $bill['amount']; ?></td>
-                        <td><?php //echo ucfirst($bill['status']); ?></td>
+                        <td><?php //echo $report['type']; ?></td>
+                        <td><?php //echo date('Y-m-d', strtotime($report['date'])); ?></td>
+                        <td><?php //echo $report['details']; ?></td>
                     </tr>
                 <?php //endforeach; ?>
             </tbody>

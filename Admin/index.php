@@ -1,4 +1,24 @@
+<?php
+// Start the session if it's not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
+
+
+require_once "../model/function.php"; 
+$Fcall = new mainClass();
+
+
+
+// Logout functionality
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header('Location: ../login.php');
+    exit();
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 

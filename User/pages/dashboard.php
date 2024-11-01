@@ -60,7 +60,7 @@
                     <ul class="list-group">
                         <?php //foreach ($test_results as $result): ?>
                             <li class="list-group-item">
-                                <strong><?php// echo $result['test_name']; ?></strong>: <?php //echo $result['result']; ?>
+                                <strong><?php //echo $result['test_name']; ?></strong>: <?php //echo $result['result']; ?>
                                 <span class="badge bg-success float-end">View</span>
                             </li>
                         <?php //endforeach; ?>

@@ -32,7 +32,7 @@
     <!-- End Navbar -->
     <div class="container-fluid py-4">
     <?php require_once "control/controller.php"; ?>
-      <?php require_once "pages/footer.php"; ?>
+      <?php //require_once "pages/footer.php"; ?>
     </div>
   </main>
   <?php require_once "pages/plugin.php"; ?>

@@ -2,9 +2,8 @@
 
 
 //$patient_id = $_GET['id']; // Get patient ID from URL
-//$billing_info = $db->getBillingInfoByPatientId($patient_id); // Assuming this function exists
+//$medical_records = $db->getMedicalRecordsByPatientId($patient_id); // Assuming this function exists
 ?>
-
 
 
 <div class="container-fluid py-4">
@@ -13,8 +12,8 @@
           <div class="card">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
-                <p class="mb-0">Manage Prescriptions</p>
-                
+                <p class="mb-0">Medical Records for Patient ID: <?php //echo $patient_id; ?></p>
+                <button class="btn btn-primary btn-sm ms-auto">New Patients</button>
               </div>
             </div>
 
@@ -27,17 +26,17 @@
               <table class="table">
             <thead>
                 <tr>
-                    <th>Service</th>
-                    <th>Amount</th>
-                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Doctor</th>
                 </tr>
             </thead>
             <tbody>
-                <?php //foreach ($billing_info as $bill): ?>
+                <?php //foreach ($medical_records as $record): ?>
                     <tr>
-                        <td><?php //echo $bill['service']; ?></td>
-                        <td>$<?php //echo $bill['amount']; ?></td>
-                        <td><?php //echo ucfirst($bill['status']); ?></td>
+                        <td><?php //echo date('Y-m-d', strtotime($record['created_at'])); ?></td>
+                        <td><?php //echo $record['description']; ?></td>
+                        <td><?php //echo $record['doctor_name']; ?></td>
                     </tr>
                 <?php //endforeach; ?>
             </tbody>

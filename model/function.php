@@ -5,15 +5,10 @@ class mainClass {
     public $password = '';
     public $DB = 'clinic_db';
 
-    // public $host = 'localhost';
-    // public $user = 'zockaeor_appfare';
-    // public $password = 'oj}wfMJpYfff';
-    // public $DB = 'zockaeor_apppay';
- 
-
     private $conn;
- 
+
     public function __construct() {
+        // Correctly use $this->DB for the database name
         $this->conn = mysqli_connect($this->host, $this->user, $this->password, $this->DB);
 
         if (!$this->conn) {
@@ -21,13 +16,9 @@ class mainClass {
         }
     }
 
-    
     public function prepare($query) {
         return $this->conn->prepare($query);
     }
-
-
-
 
     public function insertUser($username, $password, $email, $role = 'patient') {
         $getpass = password_hash($password, PASSWORD_DEFAULT);
@@ -159,11 +150,82 @@ class mainClass {
 
 
 
+    public function authenticateUser($username, $password) {
+        // Prepare and bind
+        $stmt = $this->conn->prepare("SELECT user_id, username, password, role FROM users WHERE username = ? AND role !='patient'");
+        $stmt->bind_param("s", $username);
+        
+        // Execute the statement
+        $stmt->execute();
+        
+        // Bind result variables
+        $stmt->bind_result($user_id, $db_username, $db_password, $role);
+        
+        // Fetch the result
+        if ($stmt->fetch()) {
+            // Verify the password
+            if (password_verify($password, $db_password)) {
+                // Return user data if authentication is successful
+                return [
+                    'user_id' => $user_id,
+                    'username' => $db_username,
+                    'role' => $role
+                ];
+            }
+        }
+        
+        // Close the statement
+        $stmt->close();
+        
+        // Return false if authentication fails
+        return false;
+    }
 
 
 
+    // public function getAllUsers() {
+    //     $result = $this->conn->query("SELECT id, username, role FROM users");
+    //     return $result->fetch_all(MYSQLI_ASSOC);
+    // }
 
-
+    public function getAllUsers() {
+        $stmt = $this->conn->prepare("SELECT user_id, username, role FROM users WHERE role !='patient'");
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $users = $result->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+        return $users;
+    }
+    
+    public function addUser($username, $password, $role) {
+        $stmt = $this->conn->prepare("INSERT INTO users (username, password, role) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $username, $password, $role);
+        $stmt->execute();
+        $stmt->close();
+    }
+    
+    public function getUserById($id) {
+        $stmt = $this->conn->prepare("SELECT id, username, role FROM users WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $stmt->bind_result($id, $username, $role);
+        $stmt->fetch();
+        return ['id' => $id, 'username' => $username, 'role' => $role];
+    }
+    
+    public function updateUser($id, $username, $role) {
+        $stmt = $this->conn->prepare("UPDATE users SET username = ?, role = ? WHERE id = ?");
+        $stmt->bind_param("ssi", $username, $role, $id);
+        $stmt->execute();
+        $stmt->close();
+    }
+    
+    public function deleteUser($id) {
+        $stmt = $this->conn->prepare("DELETE FROM users WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $stmt->close();
+    }
 
 
 
@@ -481,7 +543,7 @@ class mainClass {
         $performedby1 = mysqli_real_escape_string($this->conn, $performedby);
         $Transaction_ID1 = mysqli_real_escape_string($this->conn, $Transaction_ID);
         
-        $sql = "INSERT INTO payments (name, reg_number, program, level, session, faculty, department, amount, payment_method, teller_number, bank_name, date_of_payment, form_of_payment, status, performed_by, transaaction_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO payments (name, reg_number, program, level, session, faculty, department, amount, payment_method, teller_number, bank_name, date_of_payment, form_of_payment, status, performed_by, transaaction_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = mysqli_prepare($this->conn, $sql);
         mysqli_stmt_bind_param($stmt, "ssssssssssssssss", $studentName, $regNo, $program, $level, $session, $faculty, $department, $amount, $paymentMethod, $tellerNumber, $bankName, $dateOfPayment, $formOfPayment, $status, $performedby, $Transaction_ID);
@@ -1240,22 +1302,30 @@ class mainClass {
 
 
 
-    function DeleteFunc($table,$field,$data){
+    public function DeleteFunc($table, $field, $data) {
+        // Prepare the SQL statement
+        $stmt = $this->conn->prepare("DELETE FROM $table WHERE $field = ?");
+        
+        // Check if the statement was prepared successfully
+        if ($stmt === false) {
+            print(mysqli_error($this->conn));
+            return false;
+        }
 
-      $sql  = "DELETE FROM $table WHERE $field='$data'";
-      $query = $this->conn->query($sql) or print(mysqli_error($this->conn));
-        if($query == true){
+        // Bind the parameter
+        $stmt->bind_param("s", $data); // Assuming $data is a string. Change "s" to "i" if it's an integer.
 
-                return true;
+        // Execute the statement
+        $query = $stmt->execute();
 
-            }else{
-
-                return false;
-
-            } 
-            
-//$this->conn->close();  
-
+        // Check if the query was successful
+        if ($query) {
+            $stmt->close(); // Close the statement
+            return true;
+        } else {
+            print(mysqli_error($this->conn)); // Print error if the query fails
+            return false;
+        }
     }
 
 
@@ -1960,7 +2030,6 @@ else {
     return 'Computer';
 }   
 }
-
 
 
 

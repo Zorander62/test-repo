@@ -1,8 +1,10 @@
 <?php
 
 
-//$billing_info = $db->getAllBillingInfo(); // Assuming this function exists
+// Fetch patients from the database
+//$patients = $db->getAllPatients(); // Assuming this function exists
 ?>
+
 
 <div class="container-fluid py-4">
       <div class="row">
@@ -16,46 +18,45 @@
             </div>
 
             <div class="card-body p-4 ">
-            <div class="table-responsive p-5">
+
+          
+          
+              <div class="table-responsive p-5">
               
-            <table class="table">
+              <button class="btn btn-primary" data-toggle="modal" data-target="#addPatientModal">Add New Patient</button>
+        <table class="table">
             <thead>
                 <tr>
-                    <th>Patient Name</th>
-                    <th>Service</th>
-                    <th>Amount</th>
-                    <th>Status</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($billing_info as $bill): ?>
+                <?php //foreach ($patients as $patient): ?>
                     <tr>
-                        <td><?php //echo $bill['patient_name']; ?></td>
-                        <td><?php // $bill['service']; ?></td>
-                        <td>$<?php //echo $bill['amount']; ?></td>
-                        <td><?php //echo ucfirst($bill['status']); ?></td>
+                        <td><?php //echo $patient['first_name'] . ' ' . $patient['last_name']; ?></td>
+                        <td><?php //echo $patient['email']; ?></td>
+                        <td><?php //echo $patient['phone']; ?></td>
+                        <td>
+                            <a href="edit_patient.php?id=<?php //echo $patient['patient_id']; ?>" class="btn btn-warning">Edit</a>
+                            <a href="delete_patient.php?id=<?php //echo $patient['patient_id']; ?>" class="btn btn-danger">Delete</a>
+                        </td>
                     </tr>
-                <?php endforeach; ?>
+                <?php //endforeach; ?>
             </tbody>
         </table>
     </div>
-            </div>
 
-  </div>
-  </div>
-  </div>
-  </div>
-
-
-  <div class="modal fade" id="addPatientModal" tabindex="-1" role="dialog" aria-labelledby="addPatientModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+    <!-- Add Patient Modal -->
+    <div class="modal" id="addPatientModal">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <form action="add_patient.php" method="post">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="addPatientModalLabel">Add New Patient</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                        <h5 class="modal-title">Add New Patient</h5>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
@@ -81,5 +82,19 @@
                     </div>
                 </form>
             </div>
-        </div>
-    </div>
+        </div>  
+
+            </div>
+
+
+
+
+</div>
+
+  </div>
+  </div>
+  </div>
+  </div>
+
+
+t

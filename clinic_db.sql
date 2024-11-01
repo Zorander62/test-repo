@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 29, 2024 at 10:18 PM
+-- Generation Time: Nov 01, 2024 at 06:30 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.12
 
@@ -325,7 +325,8 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `role`, `created_at`) VALUES
 (4, 'webworksofficial1@gmail.com', '$2y$10$4suWg5gGZEmN0u.hvPS8HeJgDdvPBDtjWcgr61QIw8g/CFjA5WnNm', 'webworksofficial1@gmail.com', 'patient', '2024-10-26 14:27:29'),
 (5, 'nimbleshop375@gmail.com', '$2y$10$SC3hNDmCDf6Usm5XXPEX/OUAJ8xco8OGLGcZpQOKD3buQNKgNyQfe', 'nimbleshop375@gmail.com', 'patient', '2024-10-26 14:33:31'),
-(6, 'pcolman128@gmail.com', '$2y$10$9iUcj6AoF1sPayg9badC0.Xu.j03n85Hw2iV0hBalblS1UhcCxajW', 'pcolman128@gmail.com', 'patient', '2024-10-26 15:36:32');
+(6, 'pcolman128@gmail.com', '$2y$10$9iUcj6AoF1sPayg9badC0.Xu.j03n85Hw2iV0hBalblS1UhcCxajW', 'pcolman128@gmail.com', 'patient', '2024-10-26 15:36:32'),
+(9, 'buike@gmail.com', '$2y$10$4suWg5gGZEmN0u.hvPS8HeJgDdvPBDtjWcgr61QIw8g/CFjA5WnNm', 'buike@gmail.com', 'admin', '2024-10-26 14:27:29');
 
 -- --------------------------------------------------------
 
@@ -620,7 +621,7 @@ ALTER TABLE `test_results`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `user_roles`

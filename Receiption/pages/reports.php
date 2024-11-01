@@ -1,7 +1,7 @@
 <?php
 
 
-//$billing_info = $db->getAllBillingInfo(); // Assuming this function exists
+//$reports = $db->getReports(); // Assuming this function exists
 ?>
 
 <div class="container-fluid py-4">
@@ -21,19 +21,17 @@
             <table class="table">
             <thead>
                 <tr>
-                    <th>Patient Name</th>
-                    <th>Service</th>
-                    <th>Amount</th>
-                    <th>Status</th>
+                    <th>Report Type</th>
+                    <th>Date</th>
+                    <th>Details</th>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($billing_info as $bill): ?>
+                <?php foreach ($reports as $report): ?>
                     <tr>
-                        <td><?php //echo $bill['patient_name']; ?></td>
-                        <td><?php // $bill['service']; ?></td>
-                        <td>$<?php //echo $bill['amount']; ?></td>
-                        <td><?php //echo ucfirst($bill['status']); ?></td>
+                        <td><?php echo $report['type']; ?></td>
+                        <td><?php echo date('Y-m-d', strtotime($report['date'])); ?></td>
+                        <td><?php echo $report['details']; ?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
