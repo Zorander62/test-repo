@@ -188,8 +188,17 @@ class mainClass {
     //     return $result->fetch_all(MYSQLI_ASSOC);
     // }
 
+    public function getAllPatients() {
+        $stmt = $this->conn->prepare("SELECT * FROM patients ");
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $users = $result->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+        return $users;
+    }
+
     public function getAllUsers() {
-        $stmt = $this->conn->prepare("SELECT user_id, username, role FROM users WHERE role !='patient'");
+        $stmt = $this->conn->prepare("SELECT * FROM users WHERE role !='patient'");
         $stmt->execute();
         $result = $stmt->get_result();
         $users = $result->fetch_all(MYSQLI_ASSOC);
@@ -197,35 +206,140 @@ class mainClass {
         return $users;
     }
     
-    public function addUser($username, $password, $role) {
-        $stmt = $this->conn->prepare("INSERT INTO users (username, password, role) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $username, $password, $role);
-        $stmt->execute();
-        $stmt->close();
-    }
+    // public function addUser($username, $password, $role) {
+    //     $stmt = $this->conn->prepare("INSERT INTO users (username, password, role) VALUES (?, ?, ?)");
+    //     $stmt->bind_param("sss", $username, $password, $role);
+    //     $stmt->execute();
+    //     $stmt->close();
+    // }
     
-    public function getUserById($id) {
-        $stmt = $this->conn->prepare("SELECT id, username, role FROM users WHERE id = ?");
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $stmt->bind_result($id, $username, $role);
-        $stmt->fetch();
-        return ['id' => $id, 'username' => $username, 'role' => $role];
-    }
+    // public function getUserById($id) {
+    //     $stmt = $this->conn->prepare("SELECT id, username, role FROM users WHERE id = ?");
+    //     $stmt->bind_param("i", $id);
+    //     $stmt->execute();
+    //     $stmt->bind_result($id, $username, $role);
+    //     $stmt->fetch();
+    //     return ['id' => $id, 'username' => $username, 'role' => $role];
+    // }
     
     public function updateUser($id, $username, $role) {
-        $stmt = $this->conn->prepare("UPDATE users SET username = ?, role = ? WHERE id = ?");
+        $stmt = $this->conn->prepare("UPDATE users SET fullname = ?, role = ? WHERE user_id = ?");
         $stmt->bind_param("ssi", $username, $role, $id);
         $stmt->execute();
         $stmt->close();
     }
     
-    public function deleteUser($id) {
-        $stmt = $this->conn->prepare("DELETE FROM users WHERE id = ?");
+    // public function deleteUser($id) {
+    //     $stmt = $this->conn->prepare("DELETE FROM users WHERE id = ?");
+    //     $stmt->bind_param("i", $id);
+    //     $stmt->execute();
+    //     $stmt->close();
+    // }
+
+
+    public function displayAppointments() {
+        $stmt = $this->conn->prepare("SELECT a.*, p.first_name, p.last_name 
+                                      FROM appointments a 
+                                      JOIN patients p ON a.patient_id = p.patient_id 
+                                      ORDER BY a.appointment_date DESC");
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $appointments = $result->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+        return $appointments;
+    }
+
+
+    public function getAppointmentDetails($id) {
+        $stmt = $this->conn->prepare("SELECT a.*, p.first_name, p.last_name FROM appointments a JOIN patients p ON a.patient_id = p.patient_id WHERE a.appointment_id = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
-        $stmt->close();
+        $result = $stmt->get_result();
+        return $result->fetch_assoc();
     }
+    
+    public function assignDoctor($appointment_id, $doctor_id) {
+        $stmt = $this->conn->prepare("UPDATE appointments SET doctor_id = ? WHERE appointment_id = ?");
+        $stmt->bind_param("ii", $doctor_id, $appointment_id);
+        return $stmt->execute();
+    }
+    
+    public function deleteAppointment($id) {
+        $stmt = $this->conn->prepare("DELETE FROM appointments WHERE appointment_id = ?");
+        $stmt->bind_param("i", $id);
+        return $stmt->execute();
+    }
+    
+    public function markAppointmentCompleted($id) {
+        $stmt = $this->conn->prepare("UPDATE appointments SET status = 'Completed' WHERE appointment_id = ?");
+        $stmt->bind_param("i", $id);
+        return $stmt->execute();
+    }
+    
+    public function getDoctors() {
+        $stmt = $this->conn->prepare("SELECT * FROM doctors");
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
+    
+    public function  addUser($name,$username, $password, $role, $email) {
+        $query = "INSERT INTO users (fullname, username, password, role, email) VALUES (?, ?, ?, ?, ?)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("sssss", $name, $username, $password, $role, $email);
+        $stmt->execute();
+        return $stmt->insert_id; // Return the ID of the newly created user
+    }
+
+
+  
+    // Function to add a doctor record
+    public function addDoctor($doctor_id, $doctor_name, $email)  {
+        $query = "INSERT INTO doctors (doctor_id, name, email) VALUES (?, ?, ?)"; // Assuming only user_id is required
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $user_id);
+        return $stmt->execute();
+    }
+
+
+    public function getUserById($user_id) {
+        $query = "SELECT * FROM users WHERE user_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_assoc();
+    }
+
+
+
+    public function deleteUser($user_id) {
+        $query = "DELETE FROM users WHERE user_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $user_id);
+        return $stmt->execute();
+    }
+
+
+
+    public function deleteDoctor($user_id) {
+        $query = "DELETE FROM doctors WHERE user_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $user_id);
+        return $stmt->execute();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

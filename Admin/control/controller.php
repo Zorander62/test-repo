@@ -27,51 +27,72 @@ switch ($action) {
         require_once 'view/dashboard.php';
         break;
 
-
         case 'appointments':
             // Home action
             require_once 'pages/appointments.php';
             break;
-
 
         case 'patients':
             // Home action
             require_once 'pages/patients.php';
             break;
 
-
-            case 'add_user':
-                // Home action
-                require_once 'pages/add_user.php';
-                break;
+        case 'add_user':
+            // Home action
+            require_once 'pages/add_user.php';
+            break;
            
+        case 'settings':
+            // Home action
+            require_once 'pages/settings.php';
+            break;
+
+        case 'reports':
+            // Home action
+            require_once 'pages/reports.php';
+            break;
+
+        case 'billing':
+            // Home action
+            require_once 'pages/billing.php';
+            break;
+
+        case 'user_management':
+            // Home action
+            require_once 'pages/user_management.php';
+            break;
+
+        case 'edit_patient':
+            
+            require_once 'pages/edit_patient.php';
+            break;
+
+        case 'appointment_details':
+        
+            require_once 'pages/appointment_details.php';
+            break;
 
 
-            case 'settings':
-                // Home action
-                require_once 'pages/settings.php';
-                break;
+        case 'edit_appointment':
+    
+            require_once 'pages/edit_appointment.php';
+            break;
 
+        case 'new_user':
 
-                case 'reports':
-                    // Home action
-                    require_once 'pages/reports.php';
-                    break;
+            require_once 'pages/add_user.php';
+            break;
 
+        case 'edit_user':
 
-                    case 'billing':
-                        // Home action
-                        require_once 'pages/billing.php';
-                        break;
-
-
-                        case 'user_management':
-                            // Home action
-                            require_once 'pages/user_management.php';
-                            break;
+            require_once 'pages/edit_user.php';
+            break;
             
                  
-
+        case 'logout':
+            
+            require_once 'pages/logout.php';
+            break;
 
 
         default:

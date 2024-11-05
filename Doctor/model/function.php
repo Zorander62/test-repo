@@ -48,121 +48,101 @@ class mainClass {
 
 
 
-    // Process payment function
-    public function processPayment($student_id, $amount, $payment_method) {
+    public function addPatient($name, $email, $phone) {
+        $stmt = $this->conn->prepare("INSERT INTO patients (name, email, phone) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $name, $email, $phone);
+        $stmt->execute();
+        $stmt->close();
+    }
 
-        // Example logic to handle the payment processing
-        $transaction_id = $this->generateTransactionID();
-        // Insert payment record into the database
-        $sql = "INSERT INTO payments (student_id, amount, payment_method, transaction_id) VALUES (?, ?, ?, ?)";
-        $stmt = mysqli_prepare($this->conn, $sql);
-        mysqli_stmt_bind_param($stmt, "idss", $student_id, $amount, $payment_method, $transaction_id);
+    // Function to get all patients
+    public function getAllPatients() {
+        $stmt = $this->conn->prepare("SELECT id, name, email, phone FROM patients");
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $patients = $result->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+        return $patients;
+    }
 
-        if (mysqli_stmt_execute($stmt)) {
+    // Function to get a patient by ID
+    public function getPatientById($id) {
+        $stmt = $this->conn->prepare("SELECT id, name, email, phone FROM patients WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $stmt->bind_result($id, $name, $email, $phone);
+        $stmt->fetch();
+        $stmt->close();
+        return ['id' => $id, 'name' => $name, 'email' => $email, 'phone' => $phone];
+    }
 
-                return true;
+    // Function to update a patient's details
+    public function updatePatient($id, $name, $email, $phone) {
+        $stmt = $this->conn->prepare("UPDATE patients SET name = ?, email = ?, phone = ? WHERE id = ?");
+        $stmt->bind_param("sssi", $name, $email, $phone, $id);
+        $stmt->execute();
+        $stmt->close();
+    }
 
-            } else {
-
-                return false;
-
-        }
-
-
+    // Function to delete a patient
+    public function deletePatient($id) {
+        $stmt = $this->conn->prepare("DELETE FROM patients WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $stmt->close();
     }
 
 
 
 
-    // Generate a unique transaction ID (example implementation)
-    private function generateTransactionID() {
-
-            return strtoupper(bin2hex(random_bytes(4)));
-
-    }
 
 
 
-    public function creatStudent($name, $reg_number, $selectProgram, $faculty, $department, $email, $phone, $gender) {
-
-        $sql = "INSERT INTO students (name, reg_number, program, faculty, department, email, phone, gender) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt = mysqli_prepare($this->conn, $sql);
-        mysqli_stmt_bind_param($stmt, "ssssssss", $name, $reg_number, $selectProgram, $faculty, $department, $email, $phone, $gender);
-        
-            if (mysqli_stmt_execute($stmt)) {
-
-                return mysqli_insert_id($this->conn);
-
-            } else {
-
-                return false;
-
-            }
-
-    }
 
 
 
-    public function creatStudent2($name, $reg_number, $selectProgram, $level, $faculty, $department, $email, $phone) {
-
-        $sql = "INSERT INTO students (name, reg_number, program, level, faculty, department, email, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-
-        $stmt = mysqli_prepare($this->conn, $sql);
-        mysqli_stmt_bind_param($stmt, "ssssssss", $name, $reg_number, $selectProgram, $level, $faculty, $department, $email, $phone);
-        
-        if (mysqli_stmt_execute($stmt)) {
-
-                return mysqli_insert_id($this->conn);
-
-        } else {
-
-                return false;
-
-        }
-
-    }
 
 
 
-    public function createAccount($name, $email, $password) {
-
-        $sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
-        $stmt = mysqli_prepare($this->conn, $sql);
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        mysqli_stmt_bind_param($stmt, "sss", $name, $email, $hashedPassword);
-        
-            if (mysqli_stmt_execute($stmt)) {
-
-                    return mysqli_insert_id($this->conn);
-
-            } else {
-
-                    return false;
-
-        }
-
-    }
 
 
 
-    public function createAccountIn($name, $email, $password, $role) {
 
-        $sql = "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)";
-        $stmt = mysqli_prepare($this->conn, $sql);
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        mysqli_stmt_bind_param($stmt, "ssss", $name, $email, $hashedPassword,$role);
 
-            if (mysqli_stmt_execute($stmt)) {
 
-                    return mysqli_insert_id($this->conn);
 
-            } else {
 
-                    return false;
 
-        }
 
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -188,17 +168,6 @@ class mainClass {
         return mysqli_stmt_num_rows($stmt) > 0;
 
     }
-
-
-    public function CheckifroomActive($room_number) {
-        $sql = "SELECT id FROM room_allocations WHERE room_number = ? AND status='active'";
-        $stmt = mysqli_prepare($this->conn, $sql);
-        mysqli_stmt_bind_param($stmt, "s", $room_number);
-        mysqli_stmt_execute($stmt);
-        mysqli_stmt_store_result($stmt);
-        return mysqli_stmt_num_rows($stmt) > 0;
-    }
-
 
 
     public function requestPasswordReset($email) {
@@ -310,158 +279,6 @@ class mainClass {
 
 
 
-    public function insertPayment($studentName,$regNo,$program,$level,$session,$faculty,$department,$amount,$paymentMethod,$tellerNumber,$bankName,$dateOfPayment,$formOfPayment,$status,$performedby,$Transaction_ID) {
-
-        $studentName1 = mysqli_real_escape_string($this->conn, $studentName);
-        $regNo1 = mysqli_real_escape_string($this->conn, $regNo);
-        $program1 = mysqli_real_escape_string($this->conn, $program);
-        $level1 = mysqli_real_escape_string($this->conn, $level);
-        $session1 = mysqli_real_escape_string($this->conn, $session);
-        $faculty1 = mysqli_real_escape_string($this->conn, $faculty);
-        $department1 = mysqli_real_escape_string($this->conn, $department);
-        $amount1 = mysqli_real_escape_string($this->conn, $amount);
-        $paymentMethod1 = mysqli_real_escape_string($this->conn, $paymentMethod);
-        $tellerNumber1 = mysqli_real_escape_string($this->conn, $tellerNumber);
-        $bankName1 = mysqli_real_escape_string($this->conn, $bankName);
-        $dateOfPayment1 = mysqli_real_escape_string($this->conn, $dateOfPayment);
-        $formOfPayment1 = mysqli_real_escape_string($this->conn, $formOfPayment);
-        $status1 = mysqli_real_escape_string($this->conn, $status);
-        $performedby1 = mysqli_real_escape_string($this->conn, $performedby);
-        $Transaction_ID1 = mysqli_real_escape_string($this->conn, $Transaction_ID);
-        
-        $sql = "INSERT INTO payments (name, reg_number, program, level, session, faculty, department, amount, payment_method, teller_number, bank_name, date_of_payment, form_of_payment, status, performed_by, transaaction_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        $stmt = mysqli_prepare($this->conn, $sql);
-        mysqli_stmt_bind_param($stmt, "ssssssssssssssss", $studentName, $regNo, $program, $level, $session, $faculty, $department, $amount, $paymentMethod, $tellerNumber, $bankName, $dateOfPayment, $formOfPayment, $status, $performedby, $Transaction_ID);
-        
-            if (mysqli_stmt_execute($stmt)) {
-
-                return mysqli_insert_id($this->conn);
-
-            } else {
-
-                return false;
-
-            }
-
-    }
-
-
-
-    public function insertPaymenthOSTEL($studentName,$regNo,$email,$room_id,$room_number,$room_type,$from_date,$to_date,$amount,$paymentMethod,$tellerNumber,$bankName,$dateOfPayment,$formOfPayment,$status,$performedby,$Transaction_ID) {
-
-        $studentName1 = mysqli_real_escape_string($this->conn, $studentName);
-        $regNo1 = mysqli_real_escape_string($this->conn, $regNo);
-        $email1 = mysqli_real_escape_string($this->conn, $email);
-        $room_id1 = mysqli_real_escape_string($this->conn, $room_id);
-        $room_number1 = mysqli_real_escape_string($this->conn, $room_number);
-        $room_type1 = mysqli_real_escape_string($this->conn, $room_type);
-        $from_date1 = mysqli_real_escape_string($this->conn, $from_date);
-        $to_date1 = mysqli_real_escape_string($this->conn, $to_date);
-        $amount1 = mysqli_real_escape_string($this->conn, $amount);
-        $paymentMethod1 = mysqli_real_escape_string($this->conn, $paymentMethod);
-        $tellerNumber1 = mysqli_real_escape_string($this->conn, $tellerNumber);
-        $bankName1 = mysqli_real_escape_string($this->conn, $bankName);
-        $dateOfPayment1 = mysqli_real_escape_string($this->conn, $dateOfPayment);
-        $formOfPayment1 = mysqli_real_escape_string($this->conn, $formOfPayment);
-        $status1 = mysqli_real_escape_string($this->conn, $status);
-        $performedby1 = mysqli_real_escape_string($this->conn, $performedby);
-        $Transaction_ID1 = mysqli_real_escape_string($this->conn, $Transaction_ID);
-        
-        $sql = "INSERT INTO hostel_payment (name, reg_number, email, room_id, room_number, room_type, from_date, to_date, amount, payment_method, teller_number, bank_name, date_of_payment, form_of_payment, status, performed_by, transaaction_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        $stmt = mysqli_prepare($this->conn, $sql);
-        mysqli_stmt_bind_param($stmt, "sssssssssssssssss", $studentName1,$regNo1,$email1,$room_id1,$room_number1,$room_type1,$from_date1,$to_date1,$amount1,$paymentMethod1,$tellerNumber1,$bankName1,$dateOfPayment1,$formOfPayment1,$status1,$performedby1,$Transaction_ID1);
-        
-        if (mysqli_stmt_execute($stmt)) {
-
-            return mysqli_insert_id($this->conn);
-
-        } else {
-
-            return false;
-
-        }
-
-    }
-
-
-
-    public function insertOnlinePayment($studentName,$regNo,$program,$level,$session,$faculty,$department,$amount,$paymentMethod,$dateOfPayment,$formOfPayment,$status,$performedby,$Transaction_ID) {
-
-        $studentName1 = mysqli_real_escape_string($this->conn, $studentName);
-        $regNo1 = mysqli_real_escape_string($this->conn, $regNo);
-        $program1 = mysqli_real_escape_string($this->conn, $program);
-        $level1 = mysqli_real_escape_string($this->conn, $level);
-        $session1 = mysqli_real_escape_string($this->conn, $session);
-        $faculty1 = mysqli_real_escape_string($this->conn, $faculty);
-        $department1 = mysqli_real_escape_string($this->conn, $department);
-        $amount1 = mysqli_real_escape_string($this->conn, $amount);
-        $paymentMethod1 = mysqli_real_escape_string($this->conn, $paymentMethod);
-        // $tellerNumber1 = mysqli_real_escape_string($this->conn, $tellerNumber);
-        // $bankName1 = mysqli_real_escape_string($this->conn, $bankName);
-        $dateOfPayment1 = mysqli_real_escape_string($this->conn, $dateOfPayment);
-        $formOfPayment1 = mysqli_real_escape_string($this->conn, $formOfPayment);
-        $status1 = mysqli_real_escape_string($this->conn, $status);
-        $performedby1 = mysqli_real_escape_string($this->conn, $performedby);
-        $Transaction_ID1 = mysqli_real_escape_string($this->conn, $Transaction_ID);
-        
-        $sql = "INSERT INTO payments (name, reg_number, program, level, session, faculty, department, amount, payment_method, date_of_payment, form_of_payment, status, performed_by, transaaction_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        $stmt = mysqli_prepare($this->conn, $sql);
-        mysqli_stmt_bind_param($stmt, "ssssssssssssss", $studentName, $regNo, $program, $level, $session, $faculty, $department, $amount, $paymentMethod, $dateOfPayment, $formOfPayment, $status, $performedby, $Transaction_ID);
-        
-        if (mysqli_stmt_execute($stmt)) {
-
-            return mysqli_insert_id($this->conn);
-
-        } else {
-
-            return false;
-
-        }
-
-    }
-
-
-
-    public function insertOnlinePaymentHostel($studentName, $regNo, $email, $room_id, $room_number, $room_type, $from_date, $to_date, $amount,$paymentMethod,$dateOfPayment,$formOfPayment,$status,$performedby,$Transaction_ID) {
-
-            $studentName1 = mysqli_real_escape_string($this->conn, $studentName);
-            $regNo1 = mysqli_real_escape_string($this->conn, $regNo);
-            $email1 = mysqli_real_escape_string($this->conn, $email);
-            $room_id1 = mysqli_real_escape_string($this->conn, $room_id);
-            $room_number1 = mysqli_real_escape_string($this->conn, $room_number);
-            $room_type1 = mysqli_real_escape_string($this->conn, $room_type);
-            $from_date1 = mysqli_real_escape_string($this->conn, $from_date);
-            $to_date1 = mysqli_real_escape_string($this->conn, $to_date);
-            $amount1 = mysqli_real_escape_string($this->conn, $amount);
-            $paymentMethod1 = mysqli_real_escape_string($this->conn, $paymentMethod);
-            // $tellerNumber1 = mysqli_real_escape_string($this->conn, $tellerNumber);
-            // $bankName1 = mysqli_real_escape_string($this->conn, $bankName);
-            $dateOfPayment1 = mysqli_real_escape_string($this->conn, $dateOfPayment);
-            $formOfPayment1 = mysqli_real_escape_string($this->conn, $formOfPayment);
-            $status1 = mysqli_real_escape_string($this->conn, $status);
-            $performedby1 = mysqli_real_escape_string($this->conn, $performedby);
-            $Transaction_ID1 = mysqli_real_escape_string($this->conn, $Transaction_ID);
-            
-            $sql = "INSERT INTO hostel_payment (name, reg_number, email, room_id, room_number, room_type, from_date, to_date, amount, payment_method, date_of_payment, form_of_payment, status, performed_by, transaaction_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-            $stmt = mysqli_prepare($this->conn, $sql);
-            mysqli_stmt_bind_param($stmt, "sssssssssssssss", $studentName1, $regNo1, $email1, $room_id1, $room_number1, $room_type1, $from_date1, $to_date1, $amount1, $paymentMethod1, $dateOfPayment1, $formOfPayment1 ,$status1, $performedby1 ,$Transaction_ID1);
-            
-            if (mysqli_stmt_execute($stmt)) {
-
-                return mysqli_insert_id($this->conn);
-
-            } else {
-
-                return false;
-
-            }
-
-    }
-
 
 
     function Targeted_info($table, $field, $data) {
@@ -515,187 +332,6 @@ class mainClass {
         }
     }
 
-
-
-    function getAllPayments() {
-
-        $sql = "SELECT * FROM payments";
-        $stmt = $this->conn->prepare($sql);
-
-        if ($stmt === false) {
-
-            // Handle statement preparation error
-            return null;
-
-        }
-
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-
-            return $result;
-
-        } else {
-
-            return null;
-
-        }
-
-
-    }
-
-
-
-    function getAllPaymentswHERE($data) {
-
-        $sql = "SELECT * FROM payments WHERE reg_number='$data'";
-        $stmt = $this->conn->prepare($sql);
-
-        if ($stmt === false) {
-
-            // Handle statement preparation error
-            return null;
-
-        }
-
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-
-            return $result;
-
-        } else {
-
-            return null;
-
-        }
-
-
-    }
-
-
-
-    function getAllPaymentsHostel() {
-
-        $sql = "SELECT * FROM hostel_payment";
-        $stmt = $this->conn->prepare($sql);
-
-        if ($stmt === false) {
-
-            // Handle statement preparation error
-            return null;
-
-        }
-
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-
-            return $result;
-
-        } else {
-
-            return null;
-
-        }
-
-
-    }
-
-
-
-
-    function getAllPaymentsHostelWHERE($data) {
-
-        $sql = "SELECT * FROM hostel_payment WHERE reg_number='$data' ORDER BY id DESC";
-        $stmt = $this->conn->prepare($sql);
-
-        if ($stmt === false) {
-
-            // Handle statement preparation error
-            return null;
-
-        }
-
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-
-            return $result;
-
-        } else {
-
-            return null;
-
-        }
-
-
-    }
-
-
-
-
-    function getAllStudent() {
-
-        $sql = "SELECT * FROM students";
-        $stmt = $this->conn->prepare($sql);
-
-        if ($stmt === false) {
-
-            // Handle statement preparation error
-            return null;
-
-        }
-
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-
-            return $result;
-
-        } else {
-
-            return null;
-
-        }
-
-
-    }
-
-
-
-    function getAllRooms() {
-
-        $sql = "SELECT * FROM rooms";
-        $stmt = $this->conn->prepare($sql);
-
-        if ($stmt === false) {
-
-            // Handle statement preparation error
-            return null;
-
-        }
-
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-
-            return $result;
-
-        } else {
-
-            return null;
-
-        }
-
-
-    }
 
 
 
@@ -802,43 +438,6 @@ class mainClass {
 
 
 
-    function EditStudent($name,$program,$level,$faculty,$department,$gender,$phone,$reg_number) {
-        // Prepare SQL query with placeholders
-        $sql = "UPDATE students SET name = ?, program = ?, level = ?, faculty = ?, department = ?, gender = ?, phone = ? WHERE reg_number = ?";
-        
-        // Prepare the statement
-        $stmt = $this->conn->prepare($sql);
-        
-        if ($stmt === false) {
-            // Handle preparation error
-            error_log('MySQL prepare error: ' . $this->conn->error);
-            return false;
-        }
-
-        // Bind parameters
-        $stmt->bind_param('ssssssss', $name, $program, $level, $faculty, $department, $gender, $phone, $reg_number);
-        
-        // Execute the statement
-        $result = $stmt->execute();
-        
-        // Check execution result
-        if ($result) {
-            // Optionally, check if any rows were affected
-            if ($stmt->affected_rows > 0) {
-                $stmt->close();
-                return true;
-            } else {
-                // No rows affected; might indicate the email does not exist
-                error_log('No rows affected. Check if the email exists.');
-            }
-        } else {
-            // Handle execution error
-            error_log('MySQL execute error: ' . $stmt->error);
-        }
-        
-        $stmt->close();
-        return false;
-    }
 
 
 
@@ -881,165 +480,6 @@ class mainClass {
     }
 
 
-
-
-    function UpdateStudent($studentName,$phone, $selectProgram, $level, $faculty, $department,$reg_numbere) {
-        // Prepare SQL query with placeholders
-        $sql = "UPDATE students SET name = ?, phone = ?,  program = ?, level = ?, faculty = ?, department = ? WHERE reg_number = ?";
-        
-        // Prepare the statement
-        $stmt = $this->conn->prepare($sql);
-        
-        if ($stmt === false) {
-            // Handle preparation error
-            error_log('MySQL prepare error: ' . $this->conn->error);
-            return false;
-        }
-
-        // Bind parameters
-        $stmt->bind_param('sssssss', $studentName,$phone, $selectProgram, $level, $faculty, $department, $reg_numbere);
-        
-        // Execute the statement
-        $result = $stmt->execute();
-        
-        // Check execution result
-        if ($result) {
-            // Optionally, check if any rows were affected
-            if ($stmt->affected_rows > 0) {
-                $stmt->close();
-                return true;
-            } else {
-                // No rows affected; might indicate the email does not exist
-                error_log('No rows affected. Check if the email exists.');
-            }
-        } else {
-            // Handle execution error
-            error_log('MySQL execute error: ' . $stmt->error);
-        }
-        
-        $stmt->close();
-        return false;
-    }
-
-
-
-    function UpdateRoom($block_floor, $hostel_name, $capacity, $available, $room_type, $fee_amount, $room_number) {
-        // Prepare SQL query with placeholders
-        $sql = "UPDATE rooms SET block_floor = ?, hostel_name = ?,  capacity = ?, available = ?, room_type = ?, fee_amount = ? WHERE room_number = ?";
-        
-        // Prepare the statement
-        $stmt = $this->conn->prepare($sql);
-        
-        if ($stmt === false) {
-            // Handle preparation error
-            error_log('MySQL prepare error: ' . $this->conn->error);
-            return false;
-        }
-
-        // Bind parameters
-        $stmt->bind_param('sssssss', $block_floor, $hostel_name, $capacity, $available, $room_type, $fee_amount, $room_number);
-        
-        // Execute the statement
-        $result = $stmt->execute();
-        
-        // Check execution result
-        if ($result) {
-            // Optionally, check if any rows were affected
-            if ($stmt->affected_rows > 0) {
-                $stmt->close();
-                return true;
-            } else {
-                // No rows affected; might indicate the email does not exist
-                error_log('No rows affected.');
-            }
-        } else {
-            // Handle execution error
-            error_log('MySQL execute error: ' . $stmt->error);
-        }
-        
-        $stmt->close();
-        return false;
-    }
-
-
-
-    function approvePay($status,$payid) {
-        // Prepare SQL query with placeholders
-        $sql = "UPDATE payments SET status = ? WHERE id = ?";
-        
-        // Prepare the statement
-        $stmt = $this->conn->prepare($sql);
-        
-        if ($stmt === false) {
-            // Handle preparation error
-            error_log('MySQL prepare error: ' . $this->conn->error);
-            return false;
-        }
-
-        // Bind parameters
-        $stmt->bind_param('ss', $status,$payid);
-        
-        // Execute the statement
-        $result = $stmt->execute();
-        
-        // Check execution result
-        if ($result) {
-            // Optionally, check if any rows were affected
-            if ($stmt->affected_rows > 0) {
-                $stmt->close();
-                return true;
-            } else {
-                // No rows affected; might indicate the email does not exist
-                error_log('No rows affected.');
-            }
-        } else {
-            // Handle execution error
-            error_log('MySQL execute error: ' . $stmt->error);
-        }
-        
-        $stmt->close();
-        return false;
-    }
-
-
-
-    function approvePayHt($status,$payid) {
-        // Prepare SQL query with placeholders
-        $sql = "UPDATE hostel_payment SET status = ? WHERE id = ?";
-        
-        // Prepare the statement
-        $stmt = $this->conn->prepare($sql);
-        
-        if ($stmt === false) {
-            // Handle preparation error
-            error_log('MySQL prepare error: ' . $this->conn->error);
-            return false;
-        }
-
-        // Bind parameters
-        $stmt->bind_param('ss', $status,$payid);
-        
-        // Execute the statement
-        $result = $stmt->execute();
-        
-        // Check execution result
-        if ($result) {
-            // Optionally, check if any rows were affected
-            if ($stmt->affected_rows > 0) {
-                $stmt->close();
-                return true;
-            } else {
-                // No rows affected; might indicate the email does not exist
-                error_log('No rows affected.');
-            }
-        } else {
-            // Handle execution error
-            error_log('MySQL execute error: ' . $stmt->error);
-        }
-        
-        $stmt->close();
-        return false;
-    }
 
 
 
@@ -1105,583 +545,6 @@ class mainClass {
 //$this->conn->close();  
 
     }
-
-
-
-    public function createRoom($room_number, $block, $hostel_name, $details, $room_type, $fee_amount) {
-
-        $room_number1 = mysqli_real_escape_string($this->conn, $room_number);
-        $block1 = mysqli_real_escape_string($this->conn, $block);
-        $hostel_name1 = mysqli_real_escape_string($this->conn, $hostel_name);
-        $details1 = mysqli_real_escape_string($this->conn, $details);
-        $room_type1 = mysqli_real_escape_string($this->conn, $room_type);
-        $fee_amount1 = mysqli_real_escape_string($this->conn, $fee_amount);
-        
-        $sql = "INSERT INTO rooms(room_number, block_floor, hostel_name, capacity, room_type, fee_amount) VALUES (?, ?, ?, ?, ?, ?)";
-
-        $stmt = mysqli_prepare($this->conn, $sql);
-        mysqli_stmt_bind_param($stmt, "ssssss", $room_number1, $block1, $hostel_name1, $details1, $room_type1, $fee_amount1);
-        
-        if (mysqli_stmt_execute($stmt)) {
-
-            return mysqli_insert_id($this->conn);
-
-        } else {
-
-            return false;
-
-        }
-
-    }
-
-
-
-    public function AllocateRoom($reg_number, $room_id, $room_number, $allocation_date, $status) {
-
-        $reg_number1 = mysqli_real_escape_string($this->conn, $reg_number);
-        $room_id1 = mysqli_real_escape_string($this->conn, $room_id);
-        $room_number1 = mysqli_real_escape_string($this->conn, $room_number);
-        $allocation_date1 = mysqli_real_escape_string($this->conn, $allocation_date);
-        $status1 = mysqli_real_escape_string($this->conn, $status);
-        
-        $sql = "INSERT INTO room_allocations(reg_number, room_id, room_number, allocation_date, status) VALUES (?, ?, ?, ?, ?)";
-
-        $stmt = mysqli_prepare($this->conn, $sql);
-        mysqli_stmt_bind_param($stmt, "sssss", $reg_number, $room_id, $room_number, $allocation_date, $status);
-        
-        if (mysqli_stmt_execute($stmt)) {
-
-            return mysqli_insert_id($this->conn);
-
-        } else {
-
-            return false;
-
-        }
-
-    }
-
-
-
-    function UpdateAllocateStatus($status, $room_number) {
-        // Prepare SQL query with placeholders
-        $sql = "UPDATE rooms SET available = ? WHERE room_number = ?";
-        
-        // Prepare the statement
-        $stmt = $this->conn->prepare($sql);
-        
-        if ($stmt === false) {
-            // Handle preparation error
-            error_log('MySQL prepare error: ' . $this->conn->error);
-            return false;
-        }
-
-        // Bind parameters
-        $stmt->bind_param('ss', $status, $room_number);
-        
-        // Execute the statement
-        $result = $stmt->execute();
-        
-        // Check execution result
-        if ($result) {
-            // Optionally, check if any rows were affected
-            if ($stmt->affected_rows > 0) {
-                $stmt->close();
-                return true;
-            } else {
-                // No rows affected; might indicate the email does not exist
-                error_log('No rows affected.');
-            }
-        } else {
-            // Handle execution error
-            error_log('MySQL execute error: ' . $stmt->error);
-        }
-        
-        $stmt->close();
-        return false;
-    }
-
-
-    public function getAllRoomChangeRequests() {
-
-            $sql = "SELECT * FROM room_change_requests";
-            $stmt = mysqli_prepare($this->conn, $sql);
-            mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
-            return mysqli_fetch_all($result, MYSQLI_ASSOC);
-
-        }
-
-
-    public function getAllRoomApplications() {
-
-            $sql = "SELECT * FROM room_applications";
-            $stmt = mysqli_prepare($this->conn, $sql);
-            mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
-            return mysqli_fetch_all($result, MYSQLI_ASSOC);
-
-        }
-
-
-    public function updateRoomChangeRequestStatus($id, $status) {
-        $sql = "UPDATE room_change_requests SET status = ? WHERE id = ?";
-        $stmt = mysqli_prepare($this->conn, $sql);
-        mysqli_stmt_bind_param($stmt, "si", $status, $id);
-        return mysqli_stmt_execute($stmt);
-        }
-
-
-    public function updateRoomApplicationStatus($id, $status) {
-
-        $sql = "UPDATE room_applications SET status = ? WHERE id = ?";
-        $stmt = mysqli_prepare($this->conn, $sql);
-        mysqli_stmt_bind_param($stmt, "si", $status, $id);
-        return mysqli_stmt_execute($stmt);
-
-    }
-
-
-    public function getRoomApplications($student_id) {
-            $sql = "SELECT * FROM room_applications WHERE student_id = ?";
-            $stmt = mysqli_prepare($this->conn, $sql);
-            mysqli_stmt_bind_param($stmt, "i", $student_id);
-            mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
-            return mysqli_fetch_all($result, MYSQLI_ASSOC);
-        }
-
-
-        // Function to get room applications report
-        public function getRoomApplicationsReport($status = null, $room_type = null) {
-            $sql = "SELECT ra.id, s.name AS student_name, s.reg_number, ra.room_type, ra.status, ra.created_at 
-                    FROM room_applications ra
-                    JOIN students s ON ra.student_id = s.id
-                    WHERE ra.status LIKE ? AND ra.room_type LIKE ?";
-            
-            $stmt = mysqli_prepare($this->conn, $sql);
-            $status = $status ?: '%';
-            $room_type = $room_type ?: '%';
-            mysqli_stmt_bind_param($stmt, "ss", $status, $room_type);
-            mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
-            return mysqli_fetch_all($result, MYSQLI_ASSOC);
-        }
-
-
-        // Function to get room change requests report
-        public function getRoomChangeRequestsReport($status = null, $requested_room_type = null) {
-            $sql = "SELECT rcr.id, s.name AS student_name, s.reg_number, rcr.requested_room_type, rcr.status, rcr.reason, rcr.created_at 
-                    FROM room_change_requests rcr
-                    JOIN students s ON rcr.student_id = s.id
-                    WHERE rcr.status LIKE ? AND rcr.requested_room_type LIKE ?";
-            
-            $stmt = mysqli_prepare($this->conn, $sql);
-            $status = $status ?: '%';
-            $requested_room_type = $requested_room_type ?: '%';
-            mysqli_stmt_bind_param($stmt, "ss", $status, $requested_room_type);
-            mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
-            return mysqli_fetch_all($result, MYSQLI_ASSOC);
-        }
-
-
-
-    public function getStudentAllocationsReport($room_type = null, $faculty = null, $department = null) {
-            $sql = "SELECT r.id AS room_id, r.room_number, s.name AS student_name, r.status , s.reg_number, s.faculty, s.department 
-                    FROM room_allocations r
-                    JOIN students s ON r.reg_number = s.reg_number
-                    JOIN rooms ro ON r.room_id = ro.id
-                    WHERE ro.room_type LIKE ? AND s.faculty LIKE ? AND s.department LIKE ?";
-            
-            $stmt = mysqli_prepare($this->conn, $sql);
-
-            // Default values to match any if not provided
-            $room_type = $room_type ?: '%';
-            $faculty = $faculty ?: '%';
-            $department = $department ?: '%';
-
-            // Bind the parameters
-            mysqli_stmt_bind_param($stmt, "sss", $room_type, $faculty, $department);
-
-            // Execute the statement
-            mysqli_stmt_execute($stmt);
-
-            // Get the result
-            $result = mysqli_stmt_get_result($stmt);
-
-            // Fetch all results as an associative array
-            return mysqli_fetch_all($result, MYSQLI_ASSOC);
-        }
-
-
-
-    public function getPaymentsReport($start_date, $end_date, $payment_method = null) {
-    $sql = "SELECT p.id AS payment_id, s.name AS student_name, s.reg_number, p.amount, p.payment_method, p.created_at 
-            FROM payments p
-            JOIN students s ON p.id = s.id
-            WHERE 1=1";
-    
-    $types = "";
-    $params = array();
-    
-    if ($start_date) {
-        $sql .= " AND DATE(p.created_at) >= ?";
-        $types .= "s";
-        $params[] = $start_date;
-    }
-    
-    if ($end_date) {
-        $sql .= " AND DATE(p.created_at) <= ?";
-        $types .= "s";
-        $params[] = $end_date;
-    }
-    
-    if ($payment_method) {
-        $sql .= " AND p.payment_method = ?";
-        $types .= "s";
-        $params[] = $payment_method;
-    }
-    
-    $stmt = mysqli_prepare($this->conn, $sql);
-    
-    if (!empty($params)) {
-        mysqli_stmt_bind_param($stmt, $types, ...$params);
-    }
-    
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    return mysqli_fetch_all($result, MYSQLI_ASSOC);
-}
-
-
-
-
-
-    public function getPaymentsReportH($start_date, $end_date, $payment_method = null) {
-    $sql = "SELECT p.id AS payment_id, s.name AS student_name, s.reg_number, p.amount, p.payment_method, p.date 
-            FROM hostel_payment p
-            JOIN students s ON p.id = s.id
-            WHERE 1=1";
-    
-    $types = "";
-    $params = array();
-    
-    if ($start_date) {
-        $sql .= " AND DATE(p.date) >= ?";
-        $types .= "s";
-        $params[] = $start_date;
-    }
-    
-    if ($end_date) {
-        $sql .= " AND DATE(p.date) <= ?";
-        $types .= "s";
-        $params[] = $end_date;
-    }
-    
-    if ($payment_method) {
-        $sql .= " AND p.payment_method = ?";
-        $types .= "s";
-        $params[] = $payment_method;
-    }
-    
-    $stmt = mysqli_prepare($this->conn, $sql);
-    
-    if (!empty($params)) {
-        mysqli_stmt_bind_param($stmt, $types, ...$params);
-    }
-    
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    return mysqli_fetch_all($result, MYSQLI_ASSOC);
-}
-
-
-public function getTotalStudents() {
-        $sql = "SELECT COUNT(*) AS total_students FROM students";
-        $result = mysqli_query($this->conn, $sql);
-        $row = mysqli_fetch_assoc($result);
-        return $row['total_students'];
-    }
-
-    // Function to get the number of students who have paid fees
-    public function getStudentsPaidFees() {
-        $sql = "SELECT COUNT(DISTINCT reg_number) AS students_paid FROM payments WHERE status = 'paid'";
-        $result = mysqli_query($this->conn, $sql);
-        $row = mysqli_fetch_assoc($result);
-        return $row['students_paid'];
-    }
-
-    // Function to get the number of students with pending fees
-    public function getStudentsPendingFees() {
-        $total_students = $this->getTotalStudents();
-        $students_paid = $this->getStudentsPaidFees();
-        return $total_students - $students_paid;
-    }
-
-    // Function to get the total overdue payments (assuming there's a due date field)
-    public function getTotalOverduePayments() {
-        $sql = "SELECT SUM(amount) AS overdue_payments FROM payments WHERE status = 'Pending' AND date_of_payment < NOW()";
-        $result = mysqli_query($this->conn, $sql);
-        $row = mysqli_fetch_assoc($result);
-        return $row['overdue_payments'] ? $row['overdue_payments'] : 0;
-    }
-
-    // Function to get the total number of rooms
-    public function getTotalRooms() {
-        $sql = "SELECT COUNT(*) AS total_rooms FROM rooms";
-        $result = mysqli_query($this->conn, $sql);
-        $row = mysqli_fetch_assoc($result);
-        return $row['total_rooms'];
-    }
-
-    // Function to get the number of available rooms
-    public function getAvailableRooms() {
-        $sql = "SELECT COUNT(*) AS available_rooms FROM rooms WHERE available = 'YES'";
-        $result = mysqli_query($this->conn, $sql);
-        $row = mysqli_fetch_assoc($result);
-        return $row['available_rooms'];
-    }
-
-    // Function to get the number of allocated rooms
-    public function getAllocatedRooms() {
-        $sql = "SELECT COUNT(*) AS allocated_rooms FROM rooms WHERE available = 'NO'";
-        $result = mysqli_query($this->conn, $sql);
-        $row = mysqli_fetch_assoc($result);
-        return $row['allocated_rooms'];
-    }
-
-    // Function to get the number of pending room change requests
-    public function getPendingRequests() {
-        $sql = "SELECT COUNT(*) AS pending_requests FROM room_change_requests WHERE status = 'Pending'";
-        $result = mysqli_query($this->conn, $sql);
-        $row = mysqli_fetch_assoc($result);
-        return $row['pending_requests'];
-    }
-
-
-    public function getTotalFeesCollected() {
-        $sql = "SELECT SUM(amount) AS total_collected FROM payments WHERE status = 'Success'";
-        $result = mysqli_query($this->conn, $sql);
-        $row = mysqli_fetch_assoc($result);
-        return $row['total_collected'] ? $row['total_collected'] : 0;
-    }
-
-    // Function to get the average payment per student
-    public function getAveragePaymentPerStudent() {
-        $sql = "SELECT AVG(total_paid) AS avg_payment FROM (SELECT SUM(amount) AS total_paid FROM payments WHERE status = 'Success' GROUP BY reg_number) AS student_totals";
-        $result = mysqli_query($this->conn, $sql);
-        $row = mysqli_fetch_assoc($result);
-        return $row['avg_payment'] ? $row['avg_payment'] : 0;
-    }
-
-    // Function to get the total outstanding fees
-    public function getTotalOutstandingFees() {
-        $sql = "SELECT SUM(amount) AS total_outstanding FROM payments WHERE status = 'Pending'";
-        $result = mysqli_query($this->conn, $sql);
-        $row = mysqli_fetch_assoc($result);
-        return $row['total_outstanding'] ? $row['total_outstanding'] : 0;
-    }
-
-
-      public function getGenderDistribution() {
-        $sql = "SELECT gender, COUNT(*) AS count FROM students GROUP BY gender";
-        $result = mysqli_query($this->conn, $sql);
-        $genderData = [];
-        while ($row = mysqli_fetch_assoc($result)) {
-            $genderData[$row['gender']] = $row['count'];
-        }
-        return $genderData;
-    }
-
-    // Function to get grade/year distribution
-    public function getGradeDistribution() {
-        $sql = "SELECT level, COUNT(*) AS count FROM students GROUP BY level";
-        $result = mysqli_query($this->conn, $sql);
-        $gradeData = [];
-        while ($row = mysqli_fetch_assoc($result)) {
-            $gradeData[$row['level']] = $row['count'];
-        }
-        return $gradeData;
-    }
-
-    // Function to get recent transactions
-    public function getRecentTransactions($limit = 3) {
-        $sql = "SELECT date, name, amount FROM payments ORDER BY date DESC LIMIT ?";
-        $stmt = mysqli_prepare($this->conn, $sql);
-        mysqli_stmt_bind_param($stmt, "i", $limit);
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
-        return mysqli_fetch_all($result, MYSQLI_ASSOC);
-    }
-
-
-
-    public function requestRoomChange($reg_number, $current_room_id, $requested_room_type, $requested_room_id = null, $reason) {
-        $status = 'Pending'; // Initial status
-        $request_date = date('Y-m-d H:i:s');
-
-        $sql = "INSERT INTO room_change_requests (reg_number, current_room_id, requested_room_id, requested_room_type, reason, status, request_date)
-                VALUES (?, ?, ?, ?, ?, ?, ?)";
-        
-        $stmt = mysqli_prepare($this->conn, $sql);
-        mysqli_stmt_bind_param($stmt, "sssssss", $reg_number, $current_room_id, $requested_room_id, $requested_room_type, $reason, $status, $request_date);
-        
-        return mysqli_stmt_execute($stmt);
-
-    }
-
-
-
-public function getAllocatedRoomDetails($reg_number) {
-
-    $sql = "SELECT r.room_number, r.room_type, r.block_floor, r.hostel_name, r.fee_amount
-            FROM room_allocations ra
-            JOIN rooms r ON ra.room_id = r.id
-            WHERE ra.reg_number = ?";
-    
-    $stmt = mysqli_prepare($this->conn, $sql);
-    mysqli_stmt_bind_param($stmt, "s", $reg_number);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    return mysqli_fetch_assoc($result); // Fetch a single row
-
-}
-
-
-
-public function applyForRoom($reg_number, $room_type, $preferences) {
-
-        $status = 'Pending'; // Initial status
-        $application_date = date('Y-m-d H:i:s');
-
-        $sql = "INSERT INTO room_applications (reg_number, room_type, preferences, application_date, status)
-                VALUES (?, ?, ?, ?, ?)";
-        
-        $stmt = mysqli_prepare($this->conn, $sql);
-        mysqli_stmt_bind_param($stmt, "sssss", $reg_number, $room_type, $preferences, $application_date, $status);
-        
-        return mysqli_stmt_execute($stmt);
-
-}
-
-
-   public function getApplicationStatus($reg_number) {
-        $sql = "SELECT status FROM room_applications WHERE reg_number = ? ORDER BY application_date DESC LIMIT 1";
-        
-        $stmt = mysqli_prepare($this->conn, $sql);
-        mysqli_stmt_bind_param($stmt, "s", $reg_number);
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
-        $row = mysqli_fetch_assoc($result);
-        
-        return $row ? $row['status'] : 'No application found';
-    }
-
-
-
-    public function updateStudentInfo($student_id, $session, $level, $address, $semester, $total_units, $date) {
-    // Define the correct column names based on your table structure
-    $sql = "UPDATE students SET session = ?, level = ?, address = ?, semester = ?, total_units = ?, course_reg_date = ? WHERE reg_number = ?";
-    
-    // Prepare the SQL statement
-    $stmt = $this->conn->prepare($sql);
-    
-    // Check for preparation errors
-    if (!$stmt) {
-        die('Prepare failed: ' . $this->conn->error);
-    }
-    
-    // Bind parameters
-    $stmt->bind_param("sssssss", $session, $level, $address, $semester, $total_units, $date, $student_id);
-    
-    // Execute the statement
-    if (!$stmt->execute()) {
-        die('Execute failed: ' . $stmt->error);
-    }
-    
-    // Close the statement
-    $stmt->close();
-    
-    return true;
-}
-
-
-    // public function updateStudentInfo($student_id, $session, $level, $address, $semester, $total_units, $date) {
-    //     $sql = "UPDATE students SET session = ?, level = ?, address = ?, semester = ?, total_units = ?, course_reg_date = ? WHERE reg_number = ?";
-    //     $stmt = $this->conn->prepare($sql);
-    //     $stmt->bind_param("sssssss", $session, $level, $address, $semester, $total_units, $date, $student_id);
-    //     $stmt->execute();
-    // }
-
-// public function updateStudentInfo($student_id, $session, $level, $address, $semester, $total_units, $date) {
-//     $sql = "UPDATE students SET session_column_name = ?, level_column_name = ?, address_column_name = ?, semester_column_name = ?, total_units_column_name = ?, course_reg_date_column_name = ? WHERE reg_number = ?";
-//     $stmt = $this->conn->prepare($sql);
-//     $stmt->bind_param("sssssss", $session, $level, $address, $semester, $total_units, $date, $student_id);
-//     $stmt->execute();
-// }
-
-
-
-public function registerCourses($regNo, $session, $level, $address, $semester, $total_units, $date, $courses) {
-    // Update student information
-    $updateSuccess = $this->updateStudentInfo($regNo, $session, $level, $address, $semester, $total_units, $date);
-
-    if (!$updateSuccess) {
-        return false;
-    }
-
-    // Insert course registrations
-    foreach ($courses as $course) {
-        $courseCode = htmlspecialchars($course['code']);
-        $courseTitle = htmlspecialchars($course['title']);
-        $courseUnit = (int) $course['unit'];
-
-        $insertSuccess = $this->insertCourseRegistration($regNo, $courseCode, $courseTitle, $courseUnit);
-
-        if (!$insertSuccess) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-
-    public function insertCourseRegistration($student_id, $course_code, $course_title, $course_unit) {
-        $sql = "INSERT INTO course_registrations (regno, course_code, course_title, course_unit) VALUES (?, ?, ?, ?)";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("ssss", $student_id, $course_code, $course_title, $course_unit);
-        $stmt->execute();
-    }
-
-    // public function updateTotalUnits($student_id, $total_units) {
-    //     $sql = "UPDATE student_info SET total_units = ? WHERE id = ?";
-    //     $stmt = $this->conn->prepare($sql);
-    //     $stmt->bind_param("ii", $total_units, $student_id);
-    //     $stmt->execute();
-    // }
-
-    // New method for admin to view registered courses
-    public function getRegisteredCourses($student_id) {
-        $sql = "SELECT * FROM course_registrations WHERE student_id = ?";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("i", $student_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        return $result->fetch_all(MYSQLI_ASSOC);
-    }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
