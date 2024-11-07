@@ -10,7 +10,7 @@
 //     $db->insertAppointment($patient_id, $appointment_date, $special_request);
 //     echo '<script>alert("Appointment created successfully!");</script>';
 // }
-
+$bills = $Fcall->getAllBills();
 ?>
 
 <div class="container-fluid py-4">
@@ -20,7 +20,7 @@
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
                 <p class="mb-0">Billing Management</p>
-                <button class="btn btn-primary btn-sm ms-auto">New Patients</button>
+                <a href="?a=new_billing" class="btn btn-primary btn-sm ms-auto">New Billing</a>
               </div>
             </div>
 
@@ -30,20 +30,35 @@
           
               <div class="table-responsive p-5">
               
-                <table class="table align-items-center mb-0"><
+                <table class="table align-items-center mb-0">
 
       
             <thead>
-                <tr>
-                <th>Patient</th>
-            <th>Service</th>
-            <th>Amount</th>
-            <th>Status</th>
-            <th>Actions</th>
+            <tr>
+                    <th>Bill ID</th>
+                    <th>Patient</th>
+                    <th>Total Amount</th>
+                    <th>Paid Amount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-               
+            <?php foreach ($bills as $bill): 
+                $user =  $Fcall->Targeted_info('patients','patient_id ',$bill['patient_id']);
+              ?>
+                    <tr>
+                        <td><?php echo $bill['billing_id']; ?></td>
+                        <td><?php echo @htmlspecialchars($user['first_name']." ".$user['last_name']); ?></td>
+                        <td><?php echo $bill['total_amount']; ?></td>
+                        <td><?php echo $bill['paid_amount']; ?></td>
+                        <td><?php echo $bill['status']; ?></td>
+                        <td>
+                            <a class="btn btn-success" href="?a=view_bill&id=<?php echo $bill['billing_id']; ?>">View</a> |
+                            <a class="btn btn-primary" href="?a=manage_payment&bill_id=<?php echo $bill['billing_id']; ?>">Manage Payment</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
             </tbody>
         </table>
             </div>

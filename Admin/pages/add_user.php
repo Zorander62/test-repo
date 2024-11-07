@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $user_id = $Fcall->addUser($user_name, $username, $password, $role, $email); // Assuming addUser returns the new user ID
 
   // If the user is a doctor, insert into the doctors table
-  if ($role === 'doctor' && $doctor_name) {
+  if ($role === 'doctor' && $user_name) {
       $Fcall->addDoctor($user_id, $user_name, $email); // Assuming addDoctor function exists in mainClass
   }
 
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="card-header pb-0">
                     <div class="d-flex align-items-center">
                         <p class="mb-0">Add New User</p>
-                        <a href="user_management.php" class="btn btn-primary btn-sm ms-auto">View Users</a>
+                        <a href="?a=user_management" class="btn btn-primary btn-sm ms-auto">View Users</a>
                     </div>
                 </div>
 

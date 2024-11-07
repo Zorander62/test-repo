@@ -38,7 +38,6 @@ if (isset($_GET['id'])) {
   }
 } 
 ?>
-
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-md-12">

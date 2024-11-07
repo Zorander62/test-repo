@@ -27,17 +27,21 @@
 
             <div class="card-body p-4 ">
 
-            <form>
-    <div class="form-group">
-        <label for="clinicName">Clinic Name</label>
-        <input type="text" class="form-control" id="clinicName" value="Your Clinic Name">
-    </div>
-    <div class="form-group">
-        <label for="clinicAddress">Address</label>
-        <input type="text" class="form-control" id="clinicAddress" value="123 Clinic St.">
-    </div>
-    <button type="submit" class="btn btn-primary">Save Changes</button>
-</form>
+            <form method="POST">
+            <div class="mb-3">
+                <label for="clinic_name" class="form-label">Clinic Name</label>
+                <input type="text" id="clinic_name" name="clinic_name" class="form-control" value="ABC Clinic">
+            </div>
+            <div class="mb-3">
+                <label for="clinic_address" class="form-label">Clinic Address</label>
+                <input type="text" id="clinic_address" name="clinic_address" class="form-control" value="123 Main St, City">
+            </div>
+            <div class="mb-3">
+                <label for="contact_number" class="form-label">Contact Number</label>
+                <input type="text" id="contact_number" name="contact_number" class="form-control" value="555-1234">
+            </div>
+            <button type="submit" class="btn btn-primary">Save Settings</button>
+        </form>
 
             </div>
 

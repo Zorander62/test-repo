@@ -9,7 +9,12 @@ if (session_status() == PHP_SESSION_NONE) {
 require_once "../model/function.php"; 
 $Fcall = new mainClass();
 
-
+if(!isset($_SESSION['username'])){
+  session_unset();
+  echo "<script>";
+  echo "location='../login.php'";
+  echo "</script>";
+}
 
 // Logout functionality
 if (isset($_GET['logout'])) {

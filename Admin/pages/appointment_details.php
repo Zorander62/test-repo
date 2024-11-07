@@ -31,12 +31,39 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <div class="form-group">
-                                    <labe for="last_name">Date | Time:</label>
+                                    <labe for="last_name">Date :</label>
                                     <input type="text" class="form-control" readonly name="appointment_date" value="<?php echo htmlspecialchars($appointment['appointment_date']); ?>" required>
                                 </div>
                             </div>
+
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <labe for="last_name"> Time:</label>
+                                    <input type="text" class="form-control" readonly name="time" value="<?php echo htmlspecialchars($appointment['time']); ?>" required>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="date_of_birth">Doctor:</label>
+                                    <input type="text" class="form-control" readonly  value="<?php echo htmlspecialchars($appointment['doctor_name']); ?>" >
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="date_of_birth">Service:</label>
+                                    <input type="text" class="form-control" readonly  value="<?php echo htmlspecialchars($appointment['service']); ?>" >
+                                </div>
+                            </div>
+
+
+
 
                             <div class="col-md-6">
                                 <div class="form-group">

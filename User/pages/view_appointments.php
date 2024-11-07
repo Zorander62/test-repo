@@ -66,7 +66,7 @@ if (isset($_GET['appointment_id'])) {
                         <th>Date </th>
                         <th> Time</th>
                         <th>Service</th>
-                        <th>Action</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -79,11 +79,7 @@ if (isset($_GET['appointment_id'])) {
                             <td><?php echo htmlspecialchars($appointment['time']); ?></td>
                             <td><?php echo htmlspecialchars($appointment['service']); ?></td>
                           
-                            <td>
-                                <a href="?a=cancel_apointment&appointment_id=<?php echo $appointment['appointment_id']; ?>" class="cancel-btn">
-                                    <i class="fas fa-times-circle"></i> Cancel
-                                </a>
-                            </td>
+                            <td><?php echo htmlspecialchars($appointment['status']); ?></td>
 
                         </tr>
                     <?php endwhile; ?>

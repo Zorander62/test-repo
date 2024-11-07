@@ -297,7 +297,7 @@ class mainClass {
     public function addDoctor($doctor_id, $doctor_name, $email)  {
         $query = "INSERT INTO doctors (doctor_id, name, email) VALUES (?, ?, ?)"; // Assuming only user_id is required
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param("i", $user_id);
+        $stmt->bind_param("iss", $doctor_id, $doctor_name, $email);
         return $stmt->execute();
     }
 
@@ -330,6 +330,312 @@ class mainClass {
 
 
 
+    public function getServices() {
+        $stmt = $this->conn->prepare("SELECT * FROM services");
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
+    
+    public function getPatients() {
+        $stmt = $this->conn->prepare("SELECT * FROM patients");
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
+
+    public function getAllBills() {
+        $stmt = $this->conn->prepare("SELECT * FROM billing");
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
+
+    public function getAllBillslist($DATA) {
+        $stmt = $this->conn->prepare("SELECT * FROM bill_services WHERE bill_id='$DATA'");
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+  
+
+    public function createBill($patient_id,  $total_amount, $paid_amount, $status) {
+        $sql = "INSERT INTO billing (patient_id,  total_amount, paid_amount, status) VALUES (?, ?, ?, ?)";
+        
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("idis", $patient_id, $total_amount, $paid_amount, $status);
+
+        if ($stmt->execute()) {
+            return true; // Return the ID of the new bill
+        }
+        
+        return false;
+    }
+
+
+
+    public function addServiceToBill($bill_id, $service_id, $service_name, $price) {
+
+        $sql = "INSERT INTO bill_services (bill_id, service_id, service_name, price) VALUES (?, ?, ?, ?)";
+        
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("iisd", $bill_id, $service_id, $service_name, $price);
+
+        return $stmt->execute();
+    }
+
+    public function getBillDetails($billId) {
+        // First, fetch the bill details from the billing table
+        $stmt = $this->conn->prepare("SELECT billing_id, total_amount, patient_id FROM billing WHERE billing_id = ?");
+        $stmt->bind_param("i", $billId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    
+        // Fetch the bill details
+        $bill = $result->fetch_assoc();
+    
+        // If no bill is found, return null or an empty array
+        if (!$bill) {
+            return null;
+        }
+    
+        // Now, fetch the services related to this bill from the bill_services table
+        $stmt = $this->conn->prepare("SELECT services.ServiceName, services.price 
+                                      FROM bill_services 
+                                      JOIN services ON bill_services.service_id = services.ServiceID 
+                                      WHERE bill_services.bill_id = ?");
+        $stmt->bind_param("i", $billId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    
+        // Fetch services into an array
+        $services = [];
+        while ($service = $result->fetch_assoc()) {
+            $services[] = $service;
+        }
+    
+        // Combine the bill details and the services into one array
+        $bill['services'] = $services;
+    
+        return $bill;
+    }
+    
+
+    public function updatePayment($billId, $paidAmount) {
+        // Prepare and execute the query to fetch the total amount for the bill
+        $stmt = $this->conn->prepare("SELECT total_amount FROM billing WHERE billing_id = ?");
+        $stmt->bind_param("i", $billId); // Bind $billId as integer
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $totalAmount = $row ? $row['total_amount'] : 0;
+    
+        // Determine the status based on total amount and paid amount
+        $status = ($paidAmount >= $totalAmount) ? 'paid' : 'pending';
+    
+        // Update the billing table with the new paid amount and status
+        $stmt = $this->conn->prepare("
+            UPDATE billing 
+            SET paid_amount = ?, status = ? 
+            WHERE billing_id = ?
+        ");
+        $stmt->bind_param("dsi", $paidAmount, $status, $billId); // Bind parameters: double, string, integer
+        $updateSuccess = $stmt->execute();
+    
+        // Return the success status of the update operation
+        return $updateSuccess;
+    }
+    
+
+
+
+function getSalesData($startDate, $endDate) {
+   
+    // Ensure connection is valid
+  
+        // Prepare and execute query
+        $stmt = $this->conn->prepare("SELECT patient_name, amount, sale_date FROM sales WHERE sale_date BETWEEN ? AND ?");
+        $stmt->bind_param("ss", $startDate, $endDate);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        // Fetch all rows
+        return $result->fetch_all(MYSQLI_ASSOC);
+   
+}
+
+
+
+function fetchPatientRecords($name = '', $phone = '', $dob = '') {
+    // Get database connection
+
+    
+    // Query to fetch matching patients
+    $sql = "SELECT * FROM patients WHERE 1=1";
+
+    // Add conditions to the query based on provided parameters
+    if ($name) {
+        $sql .= " AND name LIKE '%$name%'";
+    }
+    if ($phone) {
+        $sql .= " AND phone LIKE '%$phone%'";
+    }
+    if ($dob) {
+        $sql .= " AND dob = '$dob'";
+    }
+
+    // Execute the query
+    $result = $this->conn->query($sql);
+
+    // Fetch results into an associative array
+    $patients = [];
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $patients[] = $row;
+        }
+    }
+
+    // Close the connection
+    // $this->conn->close();
+
+    return $patients;
+}
+
+// Function to fetch a patient's full record
+function fetchPatientFullRecord($patient_id) {
+    // Get database connection
+    // $conn = getDbConnection();
+
+    // Query to get patient record based on ID
+    $sql = "SELECT * FROM patients WHERE patient_id = $patient_id";
+    $result = $this->conn->query($sql);
+    $patient = $result->fetch_assoc();
+
+    // Query to get patient vitals, history, medications, etc.
+    $vitals_sql = "SELECT * FROM vitals WHERE patient_id = $patient_id";
+    $vitals_result = $this->conn->query($vitals_sql);
+    $vitals = $vitals_result->fetch_all(MYSQLI_ASSOC);
+
+    // You can repeat similar queries for other medical data like medications, history, etc.
+
+    // Close the connection
+    // $this->conn->close();
+
+    return ['patient' => $patient, 'vitals' => $vitals];
+}
+
+
+
+function fetchAllPatients() {
+  
+    $sql = "SELECT * FROM patients";  // You can add WHERE conditions if needed
+    $result = $this->conn->query($sql);
+
+    $patients = [];
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $patients[] = $row;
+        }
+    }
+    // @$this->conn->close();
+    return $patients;
+}
+
+
+function getVitalsByPatientId($patient_id) {
+    
+    $stmt = $this->conn->prepare("SELECT * FROM vitals WHERE patient_id = ?");
+    $stmt->bind_param("i", $patient_id);
+    $stmt->execute();
+    
+    $result = $stmt->get_result();
+    $vitals = [];
+    
+    while ($row = $result->fetch_assoc()) {
+        $vitals[] = $row;
+    }
+
+    $stmt->close();
+    $this->conn->close();
+
+    return $vitals;
+}
+
+
+
+function addVitals($patient_id, $blood_pressure, $heart_rate, $temperature, $weight, $height, $respiratory_rate, $oxygen_saturation, $pulse_oximetry) {
+    $conn = getDbConnection();
+    
+    $stmt = $this->conn->prepare("INSERT INTO vitals (patient_id, blood_pressure, heart_rate, temperature, weight, height, respiratory_rate, oxygen_saturation, pulse_oximetry) 
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    
+    $stmt->bind_param("issdddsdd", $patient_id, $blood_pressure, $heart_rate, $temperature, $weight, $height, $respiratory_rate, $oxygen_saturation, $pulse_oximetry);
+    
+    if ($stmt->execute()) {
+        echo "Vitals added successfully!";
+    } else {
+        echo "Error: " . $stmt->error;
+    }
+
+    $stmt->close();
+    $this->conn->close();
+}
+
+
+// function getBillsByDoctor($doctor_id) {
+   
+
+//     // Query to fetch billings associated with services provided by a doctor
+//     $query = "
+//         SELECT b.* 
+//         FROM billing b
+//         JOIN bill_service bs ON bs.billing_id = b.billing_id
+//         JOIN service s ON s.service_id = bs.service_id
+//         WHERE s.doctor_id = ? 
+//         ORDER BY b.billing_id DESC
+//     ";
+
+//     // Prepare and execute the query
+//     $stmt = $this->conn->prepare($query);
+//     $stmt->bind_param("i", $doctor_id); // Bind the doctor ID to the query
+//     $stmt->execute();
+    
+//     // Fetch and return the results
+//     $result = $stmt->get_result();
+//     $bills = [];
+    
+//     while ($row = $result->fetch_assoc()) {
+//         $bills[] = $row;
+//     }
+    
+//     return $bills;
+
+// }
+
+
+function getBillsByDoctor($doctor_id) {
+    // Query to fetch billings where doctor_id matches the provided doctor
+    $query = "
+        SELECT b.*, p.first_name, p.last_name
+        FROM billing b
+        JOIN patients p ON p.patient_id = b.patient_id
+        WHERE b.doctor_id = ?
+        ORDER BY b.billing_id DESC
+    ";
+
+    // Prepare and execute the query
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("i", $doctor_id); // Bind the doctor ID to the query
+    $stmt->execute();
+    
+    // Fetch and return the results
+    $result = $stmt->get_result();
+    $bills = [];
+    
+    while ($row = $result->fetch_assoc()) {
+        $bills[] = $row;
+    }
+    
+    return $bills;
+}
 
 
 
@@ -337,9 +643,913 @@ class mainClass {
 
 
 
+function getPrescriptionsByPatient($patient_id) {
+    $query = "SELECT * FROM prescriptions WHERE patient_id = ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("i", $patient_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $prescriptions = [];
+    while ($row = $result->fetch_assoc()) {
+        $prescriptions[] = $row;
+    }
+    return $prescriptions;
+}
+
+
+public function addPrescription($data) {
+    // Insert the prescription into the `prescriptions` table
+    $query = "INSERT INTO prescriptions (patient_id, doctor_id, medication_id, dosage, frequency, start_date, end_date, instructions)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param(
+        "iiisssss",
+        $data['patient_id'],
+        $data['doctor_id'],
+        $data['medication_id'],
+        $data['dosage'],
+        $data['frequency'],
+        $data['start_date'],
+        $data['end_date'],
+        $data['instructions']
+    );
+
+    $stmt->execute();
+
+    // Fetch medication price and add to billing if necessary
+    $medication = $this->getMedicationById($data['medication_id']);
+    $this->addToBilling($data['patient_id'], $data['doctor_id'], $medication['price'], $stmt->insert_id);
+}
+
+// Helper function to get a specific medication by ID
+public function getMedicationById($medication_id) {
+    $query = "SELECT * FROM medications WHERE medication_id = ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("i", $medication_id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+// Function to add prescription charge to the billing
+public function addToBilling($patient_id, $doctor_id, $amount, $prescription_id) {
+    // Create a new billing record
+    $query = "INSERT INTO billing (patient_id, doctor_id, total_amount, status)
+              VALUES (?, ?, ?, 'pending')";
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("iid", $patient_id, $doctor_id, $amount);
+    $stmt->execute();
+
+    $data =  $this->Targeted_info('medications','medication_id',$prescription_id);
+    $med_name = $data['name'];
+
+    // Link billing with the prescription
+    $billing_id = $stmt->insert_id;
+    $query = "INSERT INTO bill_services (bill_id, service_id, service_name, price) VALUES (?, ?, ?, ?)";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("iisd", $billing_id, $prescription_id, $med_name, $amount);
+    $stmt->execute();
+}
+
+
+public function getMedications() {
+    // Query to fetch all medications from the database
+    $query = "SELECT medication_id, name, price FROM medications ORDER BY name ASC";
+    
+    $stmt = $this->conn->prepare($query);
+    $stmt->execute();
+    
+    // Fetch all results and return as an associative array
+    $result = $stmt->get_result();
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
 
 
 
+
+// Fetch a single prescription by ID
+function getPrescriptionById($prescription_id) {
+    $query = "SELECT * FROM prescriptions WHERE prescription_id = ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("i", $prescription_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_assoc();
+}
+
+// Update prescription details
+// function updatePrescription($data) {
+//     $query = "
+//         UPDATE prescriptions
+//         SET medication_id = ?, dosage = ?, frequency = ?, start_date = ?, end_date = ?, instructions = ?
+//         WHERE prescription_id = ?
+//     ";
+//     $stmt = $this->conn->prepare($query);
+//     $stmt->bind_param("ssssssi", 
+//         $data['medication'], 
+//         $data['dosage'], 
+//         $data['frequency'], 
+//         $data['start_date'], 
+//         $data['end_date'], 
+//         $data['instructions'], 
+//         $data['prescription_id']
+//     );
+//     $stmt->execute();
+// }
+
+
+// function updatePrescription($prescription_id, $medications) {
+//     // global $db;
+
+//     // Start a transaction
+//     $this->conn->begin_transaction();
+    
+//     try {
+//         // Delete all existing prescription items
+//         $delete_query = "DELETE FROM prescription_items WHERE prescription_id = ?";
+//         $stmt = $this->conn->prepare($delete_query);
+//         $stmt->bind_param("i", $prescription_id);
+//         $stmt->execute();
+
+//         // Insert new prescription items
+//         $insert_query = "INSERT INTO prescription_items (prescription_id, medication_id, quantity) VALUES (?, ?, ?)";
+//         foreach ($medications as $medication) {
+//             // Insert each medication into the prescription_items table
+//             $stmt = $this->conn->prepare($insert_query);
+//             $stmt->bind_param("iii", $prescription_id, $medication['medication_id'], $medication['quantity']);
+//             $stmt->execute();
+//         }
+
+//         // Commit the transaction
+//         $this->conn->commit();
+//     } catch (Exception $e) {
+//         // Rollback the transaction if there's an error
+//         $this->conn->rollback();
+//         throw $e; // Optionally rethrow the exception to handle it later
+//     }
+// }
+
+public function updatePrescription($data) {
+    $query = "UPDATE prescriptions SET 
+                patient_id = ?, 
+                doctor_id = ?, 
+                medication_id = ?, 
+                dosage = ?, 
+                frequency = ?, 
+                start_date = ?, 
+                end_date = ?, 
+                instructions = ?, 
+                status = ?,
+                updated_at = NOW()
+              WHERE prescription_id = ?";
+
+    // Prepare statement
+    if ($stmt = $this->conn->prepare($query)) {
+        // Bind parameters
+        $stmt->bind_param(
+            "iisssssssi", 
+            $data['patient_id'], 
+            $data['doctor_id'], 
+            $data['medication_id'], 
+            $data['dosage'], 
+            $data['frequency'], 
+            $data['start_date'], 
+            $data['end_date'], 
+            $data['instructions'], 
+            $data['status'], 
+            $data['prescription_id']
+        );
+
+        // Execute the query
+        if ($stmt->execute()) {
+            $stmt->close();
+            return true;
+        } else {
+            // If execution failed
+            error_log("Update failed: " . $stmt->error);
+            $stmt->close();
+            return false;
+        }
+    } else {
+        // If preparation failed
+        error_log("Preparation failed: " . $this->conn->error);
+        return false;
+    }
+}
+
+public function deletePrescription($prescription_id) {
+    $query = "DELETE FROM prescriptions WHERE prescription_id = ?";
+
+    if ($stmt = $this->conn->prepare($query)) {
+        // Bind the prescription ID to the query
+        $stmt->bind_param("i", $prescription_id);
+
+        // Execute the delete query
+        if ($stmt->execute()) {
+            $stmt->close();
+            return true;
+        } else {
+            error_log("Delete failed: " . $stmt->error);
+            $stmt->close();
+            return false;
+        }
+    } else {
+        error_log("Preparation failed: " . $this->conn->error);
+        return false;
+    }
+}
+
+// function updatePrescription($prescription_id, $medications) {
+
+//     // Start a transaction
+//     $this->conn->begin_transaction();
+    
+//     try {
+//         // Delete all existing prescription items
+//         $delete_query = "DELETE FROM prescription_items WHERE prescription_id = ?";
+//         $stmt = $this->conn->prepare($delete_query);
+//         $stmt->bind_param("i", $prescription_id);
+//         $stmt->execute();
+
+//         // Insert new prescription items
+//         $insert_query = "INSERT INTO prescription_items (prescription_id, medication_id) VALUES (?, ?)";
+//         foreach ($medications as $medication_id) {
+//             // Insert each medication into the prescription_items table
+//             $stmt = $this->conn->prepare($insert_query);
+//             $stmt->bind_param("ii", $prescription_id, $medication_id);
+//             $stmt->execute();
+//         }
+
+//         // Commit the transaction
+//         $this->conn->commit();
+//     } catch (Exception $e) {
+//         // Rollback the transaction if there's an error
+//         $this->conn->rollback();
+//         throw $e; // Optionally rethrow the exception to handle it later
+//     }
+// }
+
+
+
+
+// Get total number of prescriptions by doctor
+function getPrescriptionCountByDoctor($doctor_id) {
+    $query = "SELECT COUNT(*) as total_prescriptions FROM prescriptions WHERE doctor_id = ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("i", $doctor_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_assoc()['total_prescriptions'];
+}
+
+// Get a list of unique medications prescribed by doctor
+function getMedicationsByDoctor($doctor_id) {
+    $query = "
+        SELECT DISTINCT medication_id 
+        FROM prescriptions _id
+        WHERE doctor_id = ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("i", $doctor_id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+// Get list of patients seen by doctor
+function getPatientsByDoctor($doctor_id) {
+    $query = "
+        SELECT DISTINCT patients.patient_id, patients.first_name 
+        FROM prescriptions 
+        JOIN patients ON prescriptions.patient_id = patients.patient_id 
+        WHERE prescriptions.doctor_id = ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("i", $doctor_id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+// Get prescription details for the report
+function getPrescriptionDetailsByDoctor($doctor_id) {
+    $query = "
+        SELECT p.*, m.name as medication_name 
+        FROM prescriptions p 
+        JOIN medications m ON p.medication_id = m.medication_id 
+        WHERE p.doctor_id = ?
+        ORDER BY p.created_at DESC
+    ";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("i", $doctor_id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+
+function getTodaysAppointments() {
+    $today = date('Y-m-d');
+    $query = "SELECT patient_id, time, status FROM appointments WHERE appointment_date = ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("s", $today);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+
+
+function getRecentMedicalRecords($limit = 5) {
+    $query = "SELECT patient_id, description, created_at FROM medical_records ORDER BY created_at DESC LIMIT ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("i", $limit);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+
+
+function addMedication($name, $description, $unit_price, $stock_quantity, $batch_number, $expiration_date) {
+    $query = "INSERT INTO medications (name, description, unit_price, stock_quantity, batch_number, expiration_date) 
+              VALUES (?, ?, ?, ?, ?, ?)";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("ssdisd", $name, $description, $unit_price, $stock_quantity, $batch_number, $expiration_date);
+    $stmt->execute();
+    return $stmt->insert_id;
+}
+
+
+function updateStock($medication_id, $quantity) {
+    $query = "UPDATE medications SET stock_quantity = stock_quantity - ? WHERE medication_id = ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("ii", $quantity, $medication_id);
+    $stmt->execute();
+    return $stmt->affected_rows > 0;
+}
+
+
+function getMedicationStock($medication_id) {
+    $query = "SELECT * FROM medications WHERE medication_id = ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("i", $medication_id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+
+
+function checkLowStock() {
+    $query = "SELECT name, stock_quantity FROM medications WHERE stock_quantity <= low_stock_threshold";
+    $result = $this->conn->query($query);
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
+
+
+
+function getAllMedications() {
+    // Prepare the SQL query to select all medications
+    $query = "SELECT medication_id, name, description, price, stock_quantity, batch_number, expiration_date FROM medications";
+
+    // Execute the query
+    $result = $this->conn->query($query);
+
+    // Check if the query was successful
+    if ($result) {
+        // Fetch all records from the result set
+        return $result->fetch_all(MYSQLI_ASSOC);
+    } else {
+        // Return an empty array if there was an error
+        return [];
+    }
+}
+
+
+function recordSale($medication_id, $quantity_sold) {
+    // Update stock quantity
+    $this->updateStock($medication_id, $quantity_sold);
+
+    // Record sale in sales table
+    $query = "INSERT INTO sales (medication_id, quantity_sold, sale_date) VALUES (?, ?, NOW())";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("ii", $medication_id, $quantity_sold);
+    $stmt->execute();
+}
+
+
+
+
+function generateInventoryReport() {
+    $query = "SELECT name, stock_quantity, batch_number, expiration_date FROM medications";
+    $result = $this->conn->query($query);
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
+function generateSalesReport($start_date, $end_date) {
+    $query = "SELECT m.name, SUM(s.quantity_sold) AS total_sold
+              FROM sales s
+              JOIN medications m ON s.medication_id = m.medication_id
+              WHERE s.sale_date BETWEEN ? AND ?
+              GROUP BY m.name";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("ss", $start_date, $end_date);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+
+public function updateMedicationStock($medication_id, $quantity, $batch_number, $expiration_date)
+{
+    // Assuming you're using mysqli for database connection
+    $sql = "UPDATE medications SET stock_quantity = ?, batch_number = ?, expiration_date = ? WHERE medication_id = ?";
+    
+    // Prepare the query
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bind_param("issi", $quantity, $batch_number, $expiration_date, $medication_id); // Binding parameters
+    
+    // Execute the query
+    if ($stmt->execute()) {
+        return true; // Update success
+    } else {
+        return false; // Update failed
+    }
+}
+
+
+public function addNewMedication($name, $description, $stock_quantity, $price, $batch_number, $expiration_date)
+{
+    // Assuming you're using mysqli for database connection
+    $sql = "INSERT INTO medications (name, description, stock_quantity, price, batch_number, expiration_date) 
+            VALUES (?, ?, ?, ?, ?, ?)";
+    
+    // Prepare the query
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bind_param("ssisds", $name, $description, $stock_quantity, $price, $batch_number, $expiration_date); // Binding parameters
+    
+    // Execute the query
+    if ($stmt->execute()) {
+        return true; // Insert success
+    } else {
+        return false; // Insert failed
+    }
+}
+
+
+
+public function getAllPrescriptions() {
+    // Assuming you are using MySQLi or PDO for database connection
+    $query = "SELECT * FROM prescriptions ORDER BY created_at DESC"; // Ordering by date (optional)
+    
+    $result = $this->conn->query($query);  // If using MySQLi
+    // $result = $this->db->prepare($query); // If using PDO
+    // $result->execute();  // For PDO
+    
+    $prescriptions = [];
+    
+    // Fetch all records
+    while ($row = $result->fetch_assoc()) {  // If using MySQLi
+        $prescriptions[] = $row;
+    }
+    
+    // return the prescriptions array
+    return $prescriptions;
+}
+
+
+
+public function getAllPrescriptionsCom() {
+    // Assuming you are using MySQLi or PDO for database connection
+    $query = "SELECT * FROM prescriptions WHERE status!='completed' ORDER BY created_at DESC"; // Ordering by date (optional)
+    
+    $result = $this->conn->query($query);  // If using MySQLi
+    // $result = $this->db->prepare($query); // If using PDO
+    // $result->execute();  // For PDO
+    
+    $prescriptions = [];
+    
+    // Fetch all records
+    while ($row = $result->fetch_assoc()) {  // If using MySQLi
+        $prescriptions[] = $row;
+    }
+    
+    // return the prescriptions array
+    return $prescriptions;
+}
+
+
+// public function getAllPrescriptions22($prescription_id) {
+//     // Assuming you are using MySQLi or PDO for database connection
+//     $query = "SELECT * FROM prescriptions WHERE prescription_id = ? ORDER BY created_at DESC"; // Ordering by date (optional)
+    
+//     $result = $this->conn->query($query);  // If using MySQLi
+//     // $result = $this->db->prepare($query); // If using PDO
+//     // $result->execute();  // For PDO
+    
+//     $prescriptions = [];
+    
+//     // Fetch all records
+//     while ($row = $result->fetch_assoc()) {  // If using MySQLi
+//         $prescriptions[] = $row;
+//     }
+    
+//     // return the prescriptions array
+//     return $prescriptions;
+// }
+
+
+public function getAllPrescriptionsById($prescription_id) {
+    // Define query with placeholder
+    $query = "SELECT * FROM prescriptions WHERE prescription_id = ? ORDER BY created_at DESC";
+
+    // Prepare the statement
+    $stmt = $this->conn->prepare($query);
+    if (!$stmt) {
+        // Handle prepare statement error
+        die("Prepare failed: (" . $this->conn->errno . ") " . $this->conn->error);
+    }
+
+    // Bind the prescription_id parameter
+    $stmt->bind_param("i", $prescription_id);
+
+    // Execute the query
+    $stmt->execute();
+
+    // Get the result
+    $result = $stmt->get_result();
+
+    // Fetch all records and store in an array
+    $prescriptions = [];
+    while ($row = $result->fetch_assoc()) {
+        $prescriptions[] = $row;
+    }
+
+    // Close the statement
+    $stmt->close();
+
+    // Return the prescriptions array
+    return $prescriptions;
+}
+
+
+// Assuming $db is the database connection instance
+function getPrescriptionItems($prescription_id) {
+ 
+
+    // Prepare the SQL query to fetch the prescription items based on the prescription ID
+    $query = "SELECT p.medication_id, pi.dosage, pi.instructions
+              FROM prescription_items pi
+              JOIN medications p ON pi.medication_id = p.medication_id
+              WHERE pi.prescription_id = ?";
+    
+    // Prepare the statement
+    if ($stmt =  $this->conn->prepare($query)) {
+        // Bind the prescription_id to the query
+        $stmt->bind_param("i", $prescription_id);
+        
+        // Execute the query
+        $stmt->execute();
+        
+        // Bind the result variables
+        $stmt->bind_result($medication_name, $dosage, $instructions);
+        
+        // Fetch the result into an associative array
+        $items = [];
+        while ($stmt->fetch()) {
+            $items[] = [
+                'medication_name' => $medication_name,
+                'dosage' => $dosage,
+                'instructions' => $instructions,
+            ];
+        }
+        
+        // Close the statement
+        $stmt->close();
+        
+        return $items; // Return the prescription items
+    } else {
+        // Handle error if the query preparation fails
+        return false;
+    }
+}
+
+
+
+
+// public function getAllPrescriptions() {
+//     $query = "SELECT * FROM prescriptions";
+//     $result =  $this->conn->query($query);
+//     return $result->fetch_all(MYSQLI_ASSOC);
+// }
+
+
+public function dispenseMedication($prescription_id, $quantity, $total_amount) {
+    // Start a database transaction to ensure consistency
+    $this->conn->begin_transaction();
+    try {
+        // Fetch prescription details to get medication_id
+        $query = "SELECT medication_id FROM prescriptions WHERE prescription_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $prescription_id);
+        $stmt->execute();
+        $prescription = $stmt->get_result()->fetch_assoc();
+
+        if (!$prescription) {
+            throw new Exception("Prescription not found.");
+        }
+
+        $medication_id = $prescription['medication_id'];
+
+        // Fetch current stock quantity from the medications table
+        $stock_query = "SELECT stock_quantity FROM medications WHERE medication_id = ?";
+        $stock_stmt = $this->conn->prepare($stock_query);
+        $stock_stmt->bind_param("i", $medication_id);
+        $stock_stmt->execute();
+        $medication = $stock_stmt->get_result()->fetch_assoc();
+
+        if (!$medication) {
+            throw new Exception("Medication not found.");
+        }
+
+        // Check if sufficient stock is available
+        if ($medication['stock_quantity'] < $quantity) {
+            throw new Exception("Insufficient stock for this medication.");
+        }
+
+        // Deduct the dispensed quantity from the stock
+        $new_stock_quantity = $medication['stock_quantity'] - $quantity;
+        $update_stock_query = "UPDATE medications SET stock_quantity = ? WHERE medication_id = ?";
+        $update_stock_stmt = $this->conn->prepare($update_stock_query);
+        $update_stock_stmt->bind_param("ii", $new_stock_quantity, $medication_id);
+        $update_stock_stmt->execute();
+
+        $new_dispensed_status = 'completed';
+        $update_prescription_query = "UPDATE prescriptions SET status = ? WHERE prescription_id = ?";
+        $update_prescription_stmt = $this->conn->prepare($update_prescription_query);
+        $update_prescription_stmt->bind_param("si", $new_dispensed_status, $prescription_id);
+        $update_prescription_stmt->execute();
+
+        // Insert a record into the 'dispensed_medications' table to record this transaction
+        $sale_query = "INSERT INTO dispensed_medications (prescription_id, medication_id, quantity, total_amount, dispensed_at) VALUES (?, ?, ?, ?, NOW())";
+        $sale_stmt = $this->conn->prepare($sale_query);
+        $sale_stmt->bind_param("iiid", $prescription_id, $medication_id, $quantity, $total_amount);
+        $sale_stmt->execute();
+
+        // Commit the transaction
+        $this->conn->commit();
+
+        return true;
+    } catch (Exception $e) {
+        // Roll back the transaction in case of an error
+        $this->conn->rollback();
+        echo "Error dispensing medication: " . $e->getMessage();
+        return false;
+    }
+}
+
+
+
+
+public function getAllSales() {
+    $query = "SELECT s.sale_id, p.patient_id, s.sale_date, s.amount
+              FROM sales s
+              JOIN patients p ON s.patient_id = p.patient_id";
+    $stmt = $this->conn->prepare($query);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+// Fetch sale details by ID
+public function getSaleById($sale_id) {
+    $query = "SELECT s.sale_id, p.patient_name, s.sale_date, s.total_amount
+              FROM sales s
+              JOIN patients p ON s.patient_id = p.patient_id
+              WHERE s.sale_id = ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("i", $sale_id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+// Fetch items related to the sale
+public function getSaleItems($sale_id) {
+    $query = "SELECT m.medication_name, si.quantity, m.price, (si.quantity * m.price) AS total
+              FROM sale_items si
+              JOIN medications m ON si.medication_id = m.medication_id
+              WHERE si.sale_id = ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("i", $sale_id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+
+
+
+
+
+
+// Fetch all dispensed medication records
+public function getAllDispensedMedications() {
+    $query = "SELECT * FROM dispensed_medications";
+    $stmt = $this->conn->prepare($query);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+// Fetch dispensed medication details by ID
+public function getDispensedMedicationById($dispensed_id) {
+    $query = "SELECT dm.dispensed_id, p.patient_name, m.medication_name, dm.quantity, dm.total_amount, dm.dispensed_at
+              FROM dispensed_medications dm
+              JOIN patients p ON dm.patient_id = p.patient_id
+              JOIN medications m ON dm.medication_id = m.medication_id
+              WHERE dm.dispensed_id = ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("i", $dispensed_id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+
+
+
+
+function getAllTests() {
+    $query = "SELECT * FROM tests"; 
+    $stmt = $this->conn->prepare($query);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);// Select all tests
+    // return $this->conn->query($query)->fetchAll();
+}
+
+public function addTest($test_name, $description) {
+    // Validate inputs (basic example, can be expanded further)
+    $test_name = trim($test_name);
+    $description = trim($description);
+
+    // Check if inputs are valid
+    if (empty($test_name) || empty($description)) {
+        return false; // Return false if any of the fields is empty
+    }
+
+    // Prepare SQL query
+    $query = "INSERT INTO tests (test_name, description) VALUES (?, ?)";
+    $stmt = $this->conn->prepare($query);
+
+    // Bind parameters
+    $stmt->bind_param("ss", $test_name, $description);
+
+    // Execute query and check for success
+    if ($stmt->execute()) {
+        return true; // Insert success
+    } else {
+        // Optionally log the error here for debugging
+        // error_log("Error executing query: " . $stmt->error);
+        return false; // Insert failed
+    }
+}
+
+
+public function getAllSamples() {
+    // Your query to fetch samples
+    $query = "SELECT * FROM samples";
+    $result = $this->conn->query($query);
+
+    if ($result->num_rows > 0) {
+        $samples = [];
+        while ($row = $result->fetch_assoc()) {
+            $samples[] = $row;
+        }
+        return $samples;
+    } else {
+        return []; // Return an empty array if no samples are found
+    }
+}
+
+
+public function addSample($patient_id, $test_id, $sample_type) {
+    // Prepare the insert statement
+    $query = "INSERT INTO samples (patient_id, test_id, sample_type) VALUES (?, ?, ?)";
+    $stmt = $this->conn->prepare($query);
+
+    if ($stmt === false) {
+        die('Error preparing the statement: ' . $this->conn->error);
+    }
+
+    // Bind parameters
+    $stmt->bind_param("iis", $patient_id, $test_id, $sample_type);
+
+    // Execute the query
+    if ($stmt->execute()) {
+        return true; // Success
+    } else {
+        return false; // Error executing query
+    }
+
+    // Close the statement
+    //$stmt->close();
+}
+
+
+
+
+function getResultsForSample($sample_id) {
+    $query = "SELECT results.*, tests.test_id, patients.patient_id, patients.first_name 
+              FROM results
+              JOIN tests ON results.test_id = tests.test_id
+              JOIN samples ON results.sample_id = samples.sample_id
+              JOIN patients ON samples.patient_id = patients.patient_id
+              WHERE results.sample_id = ?";
+              $stmt = $this->conn->prepare($query);
+              $stmt->bind_param("i", $sample_id);
+
+    $stmt->execute();
+    return $stmt->fetch();
+}
+
+
+
+
+// function updateResult($sample_id, $result) {
+//     // Update test result for the given sample
+//     $query = "UPDATE results SET result = :result WHERE sample_id = :sample_id";
+//     $stmt = $this->db->prepare($query);
+//     $stmt->bindParam(':result', $result);
+//     $stmt->bindParam(':sample_id', $sample_id);
+//     $stmt->execute();
+// }
+
+
+  // Function to fetch report data based on filters (date range, test type, sample status, etc.)
+  public function getReportData($startDate = null, $endDate = null, $testType = null) {
+    // Start building the base query
+    $query = "SELECT * FROM results WHERE 1"; // The "1" ensures that the query is valid even if no filters are provided
+
+    // Prepare the query dynamically based on the provided filters
+    if ($startDate && $endDate) {
+        $query .= " AND created_at BETWEEN ? AND ?";
+    }
+    if ($testType) {
+        $query .= " AND test_name = ?";
+    }
+
+    // Prepare the statement
+    $stmt = $this->conn->prepare($query);
+
+    // Bind the parameters
+    if ($startDate && $endDate && $testType) {
+        $stmt->bind_param("sss", $startDate, $endDate, $testType);
+    } elseif ($startDate && $endDate) {
+        $stmt->bind_param("ss", $startDate, $endDate);
+    } elseif ($testType) {
+        $stmt->bind_param("s", $testType);
+    }
+
+    // Execute the query
+    $stmt->execute();
+
+    // Get the result
+    $result = $stmt->get_result();
+
+    // Return the data if available
+    if ($result->num_rows > 0) {
+        return $result->fetch_all(MYSQLI_ASSOC);
+    } else {
+        return null; // No results found
+    }
+}
+
+
+
+
+
+// Function to fetch appointments by patient ID
+function getAppointmentsByPatientId($patient_id) {
+    // Query the appointments table for the given patient_id
+    $query = "SELECT * FROM appointments WHERE patient_id = ? ORDER BY time";
+    // Prepare the statement
+    $stmt = $this->conn->prepare($query);
+    // Bind the patient_id parameter to the statement
+    $stmt->bind_param("i", $patient_id);
+    // Execute the statement
+    $stmt->execute();
+    // Get the result
+    $result = $stmt->get_result();
+    // Return the result set
+    return $result;
+}
+
+
+function getUnpaidBills($patient_id) {
+    $query = "SELECT * FROM billing WHERE patient_id = ? AND status = 'pending'";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("i", $patient_id);
+    $stmt->execute();
+    return $stmt->get_result();
+}
+
+// Function to fetch test results for a user
+function getTestResults($patient_id) {
+    $query = "SELECT * FROM samples WHERE patient_id = ?";
+    $stmt = $this->conn->prepare($query);
+    $stmt->bind_param("i", $patient_id);
+    $stmt->execute();
+    return $stmt->get_result();
+}
 
 
 

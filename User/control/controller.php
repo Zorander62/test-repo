@@ -58,8 +58,14 @@ switch ($action) {
                         require_once 'pages/check_result.php';
                         break;
 
+                        case 'view_appointments':
+                            // Home action
+                            require_once 'pages/view_appointments.php';
+                            break;
+    
+
             
-                
+                        
 
 
         default:
