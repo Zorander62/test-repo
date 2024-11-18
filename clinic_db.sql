@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 07, 2024 at 11:52 AM
+-- Generation Time: Nov 18, 2024 at 02:56 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.12
 
@@ -244,10 +244,20 @@ CREATE TABLE `medical_records` (
   `record_id` int(11) NOT NULL,
   `patient_id` int(11) NOT NULL,
   `doctor_id` int(11) NOT NULL,
+  `reason` varchar(255) DEFAULT NULL,
   `description` text NOT NULL,
+  `date` date DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `medical_records`
+--
+
+INSERT INTO `medical_records` (`record_id`, `patient_id`, `doctor_id`, `reason`, `description`, `date`, `created_at`, `updated_at`) VALUES
+(1, 2, 15, 'Lab Test', 'Test Details', '2024-11-18', '2024-11-18 00:33:24', '2024-11-18 00:33:24'),
+(2, 2, 15, 'Lab Test Two', 'Other Comments', '2024-11-18', '2024-11-18 08:53:09', '2024-11-18 08:53:09');
 
 -- --------------------------------------------------------
 
@@ -340,7 +350,9 @@ CREATE TABLE `patients` (
 
 INSERT INTO `patients` (`patient_id`, `user_id`, `first_name`, `last_name`, `date_of_birth`, `gender`, `age`, `phone_number`, `email`, `blood_type`, `address`, `city`, `country`, `insurance_provider`, `insurance_policy_number`) VALUES
 (2, 4, 'Collins', 'Mina', '1995-10-26', NULL, NULL, '08164528072', 'webworksofficial1@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL),
-(3, 5, 'Destiny', 'Mark', '2024-10-26', 'Male', NULL, '09150808546', 'nimbleshop375@gmail.com', NULL, '40 Enugu Road', 'Enugu', 'Nigeria', NULL, NULL);
+(3, 5, 'Destiny', 'Mark', '2024-10-26', 'Male', NULL, '09150808546', 'nimbleshop375@gmail.com', NULL, '40 Enugu Road', 'Enugu', 'Nigeria', NULL, NULL),
+(5, 18, 'Eazybill', 'web technology', '2005-05-20', 'Male', NULL, '08108353458', 'eazybilltech@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL),
+(6, 19, 'Donald', 'Mobi', '2024-11-30', 'Male', NULL, '09150808546', 'mobidonald863@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -497,7 +509,8 @@ CREATE TABLE `samples` (
 
 INSERT INTO `samples` (`sample_id`, `patient_id`, `test_id`, `sample_type`, `date_collected`) VALUES
 (1, 2, 1, 'Normal Test', '2024-11-07 08:30:00'),
-(2, 3, 2, 'Other Type', '2024-11-07 08:40:46');
+(2, 3, 2, 'Other Type', '2024-11-07 08:40:46'),
+(3, 2, 1, 'New Lab Test Result', '2024-11-18 12:34:15');
 
 -- --------------------------------------------------------
 
@@ -607,7 +620,9 @@ INSERT INTO `users` (`user_id`, `fullname`, `username`, `password`, `email`, `ro
 (11, 'Anita Thona C', 'Rep@test.com', '$2y$10$wztmDOR0Ss/yPheNp1Zxau/fdDE74Jg2UxYPU.zrripXHMyI0rPrq', 'Rep@test.com', 'receptionist', '2024-11-05 08:56:27'),
 (15, 'Zed Doc', 'zeddoc@test.com', '$2y$10$X/N1XPaY0K7B4OUXC2D37.qOPXfPnJkZEI.AiJFBNCv6yPNulDfqO', 'zeddoc@test.com', 'doctor', '2024-11-06 06:21:41'),
 (16, 'Lab Expert', 'lab@gmail.com', '$2y$10$PABueaVYgIVS.LvMUoy8teQ.nUG8sV2JdF2YI/7q2dYHeJ8JgNR2a', 'lab@gmail.com', 'laboratory', '2024-11-06 11:34:32'),
-(17, 'Zed Pharmacy', 'pharmacy@gmail.com', '$2y$10$XDOIbLMUZMzzeBeBqxR3oe9EIc4oT6Irn8HudBVUH.DdIhSuzl/G6', 'pharmacy@gmail.com', 'pharmacy', '2024-11-06 11:38:36');
+(17, 'Zed Pharmacy', 'pharmacy@gmail.com', '$2y$10$XDOIbLMUZMzzeBeBqxR3oe9EIc4oT6Irn8HudBVUH.DdIhSuzl/G6', 'pharmacy@gmail.com', 'pharmacy', '2024-11-06 11:38:36'),
+(18, NULL, 'eazybilltech@gmail.com', '$2y$10$b1zArZ17TKKJ1AZr.bN/JuJqI1Fyz9X/UloXsEfxfT2G5fbeHRGjm', 'eazybilltech@gmail.com', 'patient', '2024-11-17 14:32:52'),
+(19, NULL, 'mobidonald863@gmail.com', '$2y$10$ETRLAwk2V3hBzxzBT/dF8.It3oYZzF91VuMcancvoDtcPsXacnSai', 'mobidonald863@gmail.com', 'patient', '2024-11-17 14:56:06');
 
 -- --------------------------------------------------------
 
@@ -652,6 +667,13 @@ CREATE TABLE `vitals` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `vitals`
+--
+
+INSERT INTO `vitals` (`id`, `patient_id`, `blood_pressure`, `heart_rate`, `temperature`, `weight`, `height`, `respiratory_rate`, `oxygen_saturation`, `pulse_oximetry`, `created_at`, `updated_at`) VALUES
+(1, 2, '78', 67, 57.00, 90.00, 5.70, 78, 76.00, 98.00, '2024-11-18 13:52:58', '2024-11-18 13:52:58');
 
 --
 -- Indexes for dumped tables
@@ -950,7 +972,7 @@ ALTER TABLE `medical_history`
 -- AUTO_INCREMENT for table `medical_records`
 --
 ALTER TABLE `medical_records`
-  MODIFY `record_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `record_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `medications`
@@ -968,7 +990,7 @@ ALTER TABLE `notifications`
 -- AUTO_INCREMENT for table `patients`
 --
 ALTER TABLE `patients`
-  MODIFY `patient_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `patient_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `patient_insurance`
@@ -1022,7 +1044,7 @@ ALTER TABLE `sales_items`
 -- AUTO_INCREMENT for table `samples`
 --
 ALTER TABLE `samples`
-  MODIFY `sample_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `sample_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `services`
@@ -1052,7 +1074,7 @@ ALTER TABLE `test_results`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `user_roles`
@@ -1070,7 +1092,7 @@ ALTER TABLE `user_role_assignments`
 -- AUTO_INCREMENT for table `vitals`
 --
 ALTER TABLE `vitals`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables
