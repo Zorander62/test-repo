@@ -79,11 +79,11 @@
 
         <?php if ($_SESSION['role'] === 'admin'): ?>
     <li class="nav-item">
-        <a class="nav-link" href="?a=patients">
+        <a class="nav-link" href="?a=patient_search">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                 <i class="fas fa-users text-warning text-sm opacity-10"></i> <!-- Users icon for managing patients -->
             </div>
-            <span class="nav-link-text ms-1">Manage Patients</span>
+            <span class="nav-link-text ms-1">Patients Search</span>
         </a>
     </li>
 
@@ -137,6 +137,17 @@
 
 
         <?php if ($_SESSION['role'] === 'doctor'): ?>
+
+    <li class="nav-item">
+        <a class="nav-link" href="?a=patient_search">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                <i class="ni ni-calendar-grid-58 text-success text-sm opacity-10"></i>
+            </div>
+            <span class="nav-link-text ms-1">Patients</span>
+        </a>
+    </li>
+
+
     <li class="nav-item">
         <a class="nav-link" href="?a=appointments">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -185,6 +196,16 @@
 
     
     <?php if ($_SESSION['role'] === 'pharmacy'): ?>
+
+        <li class="nav-item">
+        <a class="nav-link" href="?a=patient_search">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                <i class="fas fa-users text-warning text-sm opacity-10"></i> <!-- Users icon for managing patients -->
+            </div>
+            <span class="nav-link-text ms-1">Patients Search</span>
+        </a>
+    </li>
+
     <li class="nav-item">
         <a class="nav-link" href="?a=manage_inventory">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -194,14 +215,14 @@
         </a>
     </li>
 
-    <li class="nav-item">
+    <!-- <li class="nav-item">
         <a class="nav-link" href="?a=prescriptions_pharmacy">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="fas fa-prescription-bottle-alt text-success text-sm opacity-10"></i> <!-- Prescription icon for managing prescriptions -->
+                <i class="fas fa-prescription-bottle-alt text-success text-sm opacity-10"></i> 
             </div>
             <span class="nav-link-text ms-1">Manage Prescription</span>
         </a>
-    </li>
+    </li> -->
 
     <li class="nav-item">
         <a class="nav-link" href="?a=low_stock_alert">
@@ -242,6 +263,17 @@
 
 
 <?php if ($_SESSION['role'] === 'laboratory'): ?>
+
+    <li class="nav-item">
+        <a class="nav-link" href="?a=patient_search">
+            <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                <i class="fas fa-users text-warning text-sm opacity-10"></i> <!-- Users icon for managing patients -->
+            </div>
+            <span class="nav-link-text ms-1">Patients Search</span>
+        </a>
+    </li>
+
+
     <li class="nav-item">
         <a class="nav-link" href="?a=manage_test">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -251,14 +283,14 @@
         </a>
     </li>
 
-    <li class="nav-item">
+    <!-- <li class="nav-item">
         <a class="nav-link" href="?a=manage_samples">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="fas fa-vial text-warning text-sm opacity-10"></i> <!-- Vial icon for managing samples -->
+                <i class="fas fa-vial text-warning text-sm opacity-10"></i> 
             </div>
             <span class="nav-link-text ms-1">Manage Sample</span>
         </a>
-    </li>
+    </li> -->
 
     <li class="nav-item">
         <a class="nav-link" href="?a=result">
@@ -281,10 +313,10 @@
 
 
 <?php if ($_SESSION['role'] === 'admin'): ?>
-    <li class="nav-item">
-        <a class="nav-link" href="?a=patients">
+    <!-- <li class="nav-item">
+        <a class="nav-link" href="?a=patient_search">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="fas fa-users text-warning text-sm opacity-10"></i> <!-- Users icon for managing patients -->
+                <i class="fas fa-users text-warning text-sm opacity-10"></i> 
             </div>
             <span class="nav-link-text ms-1">Manage Patients</span>
         </a>
@@ -293,7 +325,7 @@
     <li class="nav-item">
         <a class="nav-link" href="?a=appointments">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="fas fa-calendar-check text-success text-sm opacity-10"></i> <!-- Calendar check icon for managing appointments -->
+                <i class="fas fa-calendar-check text-success text-sm opacity-10"></i> 
             </div>
             <span class="nav-link-text ms-1">Manage Appointments</span>
         </a>
@@ -302,7 +334,7 @@
     <li class="nav-item">
         <a class="nav-link" href="?a=billing">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="fas fa-credit-card text-info text-sm opacity-10"></i> <!-- Credit card icon for billing management -->
+                <i class="fas fa-credit-card text-info text-sm opacity-10"></i> 
             </div>
             <span class="nav-link-text ms-1">Billing Management</span>
         </a>
@@ -311,7 +343,7 @@
     <li class="nav-item">
         <a class="nav-link" href="?a=reports">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="fas fa-chart-pie text-danger text-sm opacity-10"></i> <!-- Pie chart icon for reports -->
+                <i class="fas fa-chart-pie text-danger text-sm opacity-10"></i> 
             </div>
             <span class="nav-link-text ms-1">Reports</span>
         </a>
@@ -320,7 +352,7 @@
     <li class="nav-item">
         <a class="nav-link" href="?a=settings">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="fas fa-cogs text-info text-sm opacity-10"></i> <!-- Gear icon for settings -->
+                <i class="fas fa-cogs text-info text-sm opacity-10"></i> 
             </div>
             <span class="nav-link-text ms-1">Settings</span>
         </a>
@@ -329,21 +361,21 @@
     <li class="nav-item">
         <a class="nav-link" href="?a=user_management">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="fas fa-users-cog text-warning text-sm opacity-10"></i> <!-- User cog icon for managing users -->
+                <i class="fas fa-users-cog text-warning text-sm opacity-10"></i> 
             </div>
             <span class="nav-link-text ms-1">Manage User</span>
         </a>
-    </li>
+    </li> -->
 <?php endif; ?>
 
 
 <?php if ($_SESSION['role'] === 'receptionist'): ?>
     <li class="nav-item">
-        <a class="nav-link" href="?a=patients">
+        <a class="nav-link" href="?a=patient_search">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                 <i class="fas fa-users text-warning text-sm opacity-10"></i> <!-- Users icon for managing patients -->
             </div>
-            <span class="nav-link-text ms-1">Manage Patients</span>
+            <span class="nav-link-text ms-1"> Patients Search</span>
         </a>
     </li>
 
@@ -356,15 +388,15 @@
         </a>
     </li>
 
-    <li class="nav-item">
+    <!-- <li class="nav-item">
         <a class="nav-link" href="?a=billing">
             <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="fas fa-credit-card text-info text-sm opacity-10"></i> <!-- Credit card icon for billing management -->
+                <i class="fas fa-credit-card text-info text-sm opacity-10"></i> 
             </div>
             <span class="nav-link-text ms-1">Billing Management</span>
         </a>
     </li>
-
+ -->
 
  
 

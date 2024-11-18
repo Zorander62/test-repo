@@ -48,7 +48,7 @@ $data = $Fcall->Targeted_info('patients', 'patient_id', $prescription['patient_i
             <div class="card p-4">
                 <div class="card-header d-flex align-items-center">
                     <h5 class="mb-0">Update Prescription</h5>
-                   
+                        <a class="btn btn-primary btn-sm ms-auto" onclick="history.back()">Back</a>
                 </div>
                 <div class="card-body"></div>
      <p><strong>Patient:</strong> <?php echo htmlspecialchars($data['first_name']." ".$data['last_name']); ?></p>

@@ -17,6 +17,7 @@
                 <div class="card-header pb-0">
                     <div class="d-flex align-items-center">
                         <p class="mb-0">Appointment Details</p>
+                        <a class="btn btn-primary btn-sm ms-auto" onclick="history.back()">Back</a>
                         <a href="?a=appointments" class="btn btn-primary btn-sm ms-auto">View Appointment</a>
                     </div>
                 </div>

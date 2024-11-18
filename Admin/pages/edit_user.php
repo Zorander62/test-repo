@@ -1,7 +1,7 @@
 <?php
 
 
-$user_id = $_GET['id'];
+echo $user_id = $_GET['id'];
 $user = $Fcall->getUserById($user_id); // Assuming this function exists
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -31,7 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="card-header pb-0">
                     <div class="d-flex align-items-center">
                         <p class="mb-0">Edit User </p>
-                        <a href="?a=user_management" class="btn btn-primary btn-sm ms-auto">View user</a>
+                        <!-- <a href="?a=user_management" class="btn btn-primary btn-sm ms-auto">View user</a> -->
+                        <a class="btn btn-primary btn-sm ms-auto" onclick="history.back()">Back</a>
                     </div>
                 </div>
 

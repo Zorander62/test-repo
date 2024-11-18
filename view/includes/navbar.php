@@ -20,6 +20,8 @@
                         </li> -->
                         <li><a href="?a=contact">Contact</a></li>
                         <li><a href="?a=login">Login</a></li>
+                        <li><a href="?a=register">Signup</a></li>
+                        
                     </ul>
                 </nav>
             </div>

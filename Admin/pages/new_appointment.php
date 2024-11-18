@@ -1,6 +1,8 @@
 <?php
 // Check if admin is logged in (assuming you have an authentication check function)
-
+$patient_id = isset($_GET['id']) ? $_GET['id'] : '';
+$data = $Fcall->Targeted_info('patients', 'patient_id', $patient_id);
+$patient_name=  $data['first_name'] . " " . $data['last_name'];
 
 // Fetch patients, doctors, and services
 $patients = $Fcall->getPatients();
@@ -61,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="card-header pb-0">
                     <div class="d-flex align-items-center">
                         <p class="mb-0">Create Appointment</p>
+                        <a class="btn btn-primary btn-sm ms-auto" onclick="history.back()">Back</a>
                         <a href="?a=appointments" class="btn btn-primary btn-sm ms-auto">View Appointment</a>
                     </div>
                 </div>
@@ -70,15 +73,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="row">
                 <!-- Select Patient -->
                 <div class="col-md-6">
-                    <div class="form-group">
+                <div class="form-group">
                         <label for="patient_id">Patient:</label>
-                        <select name="patient_id" class="form-control" required>
-                            <option value="">Select Patient</option>
-                            <?php foreach ($patients as $patient): ?>
-                                <option value="<?php echo $patient['patient_id']; ?>"><?php echo htmlspecialchars($patient['first_name']." ".$patient['last_name']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                        <?php if (!empty($patient_id)): ?>
+                            <!-- Auto-assign the patient ID if it's set -->
+                            <input type="hidden" name="patient_id" value="<?php echo $patient_id; ?>">
+                            <input type="text" class="form-control" value="<?php echo htmlspecialchars($patient_name); ?>" readonly>
+                        <?php else: ?>
+                            <!-- Dropdown for selecting a patient -->
+                            <select name="patient_id" class="form-control" required>
+                                <option value="">Select Patient</option>
+                                <?php foreach ($patients as $patient): ?>
+                                    <option value="<?php echo $patient['patient_id']; ?>">
+                                        <?php echo htmlspecialchars(string: $patient['first_name'] . " " . $patient['last_name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        <?php endif; ?>
                     </div>
+
                 </div>
 
                 <!-- Appointment Date -->

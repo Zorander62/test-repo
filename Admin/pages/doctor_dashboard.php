@@ -39,9 +39,9 @@ $recent_medical_records = $Fcall->getRecentMedicalRecords();
                     <?php foreach ($recent_medical_records as $record): ?>
                         <li class="list-group-item">
                             <i class="ni ni-folder-17 text-info me-2"></i>
-                            <strong><?php echo htmlspecialchars($record['patient_name']); ?></strong>: 
+                            <strong><?php echo htmlspecialchars($record['patient_id']); ?></strong>: 
                             <?php echo htmlspecialchars($record['description']); ?>
-                            <span class="badge bg-info float-end"><?php echo htmlspecialchars($record['date']); ?></span>
+                            <span class="badge bg-info float-end"><?php echo htmlspecialchars($record['created_at']); ?></span>
                         </li>
                     <?php endforeach; ?>
                 </ul>

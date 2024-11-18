@@ -19,7 +19,7 @@ if (isset($_GET['id'])) {
             <div class="card p-3">
                 <div class="card-header d-flex align-items-center">
                     <h5 class="mb-0">Prescription Details</h5>
-                   
+                    <a class="btn btn-primary btn-sm ms-auto" onclick="history.back()">Back</a>
                 </div>
                 <div class="card-body"></div>
 

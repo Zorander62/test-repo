@@ -28,9 +28,7 @@ if (isset($_GET['id'])) {
                 <div class="card-header pb-0">
                     <div class="d-flex align-items-center">
                         <p class="mb-0">Appointments</p>
-                        <?php if (in_array($role, ['admin', 'receptionist'])): ?>
-                            <a href="?a=new_appointment" class="btn btn-primary btn-sm ms-auto">New Appointment</a>
-                        <?php endif; ?>
+                        <a class="btn btn-primary btn-sm ms-auto" onclick="history.back()">Back</a>
                     </div>
                 </div>
 

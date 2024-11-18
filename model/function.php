@@ -55,6 +55,23 @@ class mainClass {
     
 
 
+    function RegsPatient($user_id, $first_name, $last_name, $birth_date, $mobile, $email, $gender) {
+        $stmt = $this->conn->prepare("INSERT INTO patients (user_id, first_name, last_name, date_of_birth, phone_number, email, gender) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("issssss", $user_id, $first_name, $last_name, $birth_date, $mobile, $email, $gender);
+
+            if ($stmt->execute()) {
+
+                    return true;
+
+                }else{
+
+                    return false;
+
+        }
+        
+    }
+
+
     function Targeted_information($table, $field, $data) {
         // Prepare the SQL statement with placeholders
         $sql = "SELECT * FROM $table WHERE $field = ?";
@@ -562,7 +579,7 @@ function getVitalsByPatientId($patient_id) {
 
 
 function addVitals($patient_id, $blood_pressure, $heart_rate, $temperature, $weight, $height, $respiratory_rate, $oxygen_saturation, $pulse_oximetry) {
-    $conn = getDbConnection();
+    
     
     $stmt = $this->conn->prepare("INSERT INTO vitals (patient_id, blood_pressure, heart_rate, temperature, weight, height, respiratory_rate, oxygen_saturation, pulse_oximetry) 
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -570,13 +587,14 @@ function addVitals($patient_id, $blood_pressure, $heart_rate, $temperature, $wei
     $stmt->bind_param("issdddsdd", $patient_id, $blood_pressure, $heart_rate, $temperature, $weight, $height, $respiratory_rate, $oxygen_saturation, $pulse_oximetry);
     
     if ($stmt->execute()) {
-        echo "Vitals added successfully!";
+        return true;
     } else {
         echo "Error: " . $stmt->error;
+        return false;
     }
 
-    $stmt->close();
-    $this->conn->close();
+    //$stmt->close();
+   // $this->conn->close();
 }
 
 
@@ -1110,6 +1128,25 @@ public function getAllPrescriptions() {
     return $prescriptions;
 }
 
+public function getAllPrescriptionsNeId($patient_id ) {
+    // Assuming you are using MySQLi or PDO for database connection
+    $query = "SELECT * FROM prescriptions WHERE patient_id='$patient_id' ORDER BY created_at DESC"; // Ordering by date (optional)
+    
+    $result = $this->conn->query($query);  // If using MySQLi
+    // $result = $this->db->prepare($query); // If using PDO
+    // $result->execute();  // For PDO
+    
+    $prescriptions = [];
+    
+    // Fetch all records
+    while ($row = $result->fetch_assoc()) {  // If using MySQLi
+        $prescriptions[] = $row;
+    }
+    
+    // return the prescriptions array
+    return $prescriptions;
+}
+
 
 
 public function getAllPrescriptionsCom() {
@@ -1419,6 +1456,15 @@ public function getAllSamples() {
         return []; // Return an empty array if no samples are found
     }
 }
+
+
+public function getPatientNameById($patient_id) {
+    $result = $this->Targeted_info('patients', 'patient_id', $patient_id);
+    return isset($result['first_name'], $result['last_name']) 
+        ? $result['first_name'] . ' ' . $result['last_name'] 
+        : 'Unknown Patient';
+}
+
 
 
 public function addSample($patient_id, $test_id, $sample_type) {
@@ -3152,6 +3198,45 @@ public function applyForRoom($reg_number, $room_type, $preferences) {
     return true;
 }
 
+
+function searchPatients( $first_name = null, $last_name = null, $dob = null) {
+    $query = "SELECT * FROM patients WHERE 1=1"; // Base query
+    $params = [];
+    $types = '';
+
+    if (!empty($first_name)) {
+        $query .= " AND first_name LIKE ?";
+        $params[] = '%' . $first_name . '%';
+        $types .= 's';
+    }
+    if (!empty($last_name)) {
+        $query .= " AND last_name LIKE ?";
+        $params[] = '%' . $last_name . '%';
+        $types .= 's';
+    }
+    if (!empty($dob)) {
+        $query .= " AND date_of_birth = ?";
+        $params[] = $dob;
+        $types .= 's';
+    }
+
+    $stmt = $this->conn->prepare($query);
+    if (!$stmt) {
+        throw new Exception(message: "Failed to prepare the query: " . $this->conn->error);
+    }
+
+    if (!empty($params)) {
+        $stmt->bind_param($types, ...$params);
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if (!$result) {
+        throw new Exception("Failed to fetch results: " . $this->conn->error);
+    }
+
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
 
     // public function updateStudentInfo($student_id, $session, $level, $address, $semester, $total_units, $date) {
     //     $sql = "UPDATE students SET session = ?, level = ?, address = ?, semester = ?, total_units = ?, course_reg_date = ? WHERE reg_number = ?";

@@ -16,8 +16,9 @@ $prescriptions = $Fcall->getPrescriptionsByPatient($patient_id);
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
               <p class="mb-0 mr-5">Manage Prescriptions</p>
-              <a href="?a=new_prescription&patient_id=<?php echo $patient_id; ?>" class="btn btn-primary btn-sm float-right ml-auto">Add New Prescription</a>
+              <!-- <a href="?a=new_prescription&patient_id=<?php //echo $patient_id; ?>" class="btn btn-primary btn-sm float-right ml-auto">Add New Prescription</a> -->
               </div>
+              <a class="btn btn-primary btn-sm ms-auto" onclick="history.back()">Back</a>
             </div>
 
            

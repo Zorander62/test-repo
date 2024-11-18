@@ -27,70 +27,48 @@ switch ($action) {
         require_once 'view/home.php';
         break;
 
-
         case 'about':
             // Home action
             require_once 'view/about.php';
             break;
 
-
-        case 'service':
-            // Home action
-
-            
-
-            require_once 'view/service.php';
-            break;
-
-
-            case 'booking':
-               
-                // Home action
-                require_once 'view/booking.php';
+            case 'service':
+                require_once 'view/service.php';
                 break;
 
-
-                case 'contact':
-                    // Home action
-                    require_once 'view/contact.php';
+                case 'booking':
+                    require_once 'view/booking.php';
                     break;
 
-
-                    case 'login':
-                        // Home action
-                        require_once 'view/login.php';
+                    case 'contact':
+                        require_once 'view/contact.php';
                         break;
 
-
-                        case 'signup':
-
-                            
-                            // Home action
-                            require_once 'view/signup.php';
+                        case 'login':
+                            require_once 'view/login.php';
                             break;
 
-                        
-                            case 'process_booking':
-                                // Home action
-                                require_once 'view/process_booking.php';
-                                break;
-                                
-
-                            case 'process_login':
-                                // Home action
-                                require_once 'view/process_login.php';
+                            case 'signup':
+                                require_once 'view/signup.php';
                                 break;
 
+                                case 'process_booking':
+                                    require_once 'view/process_booking.php';
+                                    break;
+                                    
+                                        case 'process_login':
+                                            require_once 'view/process_login.php';
+                                            break;
 
-                            case 'success':
-                                // Home action
-                                require_once 'view/success.php';
-                                break;
-        
+                                                case 'success':
+                                                    require_once 'view/success.php';
+                                                    break;
 
-                                
+                                                        case 'register':
+                                                            require_once 'view/register.php';
+                                                            break;  
 
-
+         
 
 
         default:

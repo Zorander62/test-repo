@@ -1,6 +1,6 @@
 <?php
 // Check if admin is logged in
-
+$patient_id = $_GET['id'] ?? null;
 // Fetch patients and services
 $patients = $Fcall->getPatients();
 $services = $Fcall->getServices();
@@ -47,23 +47,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="card-header pb-0">
                     <div class="d-flex align-items-center">
                         <p class="mb-0">Create Bill</p>
-                        <a href="?a=billing" class="btn btn-primary btn-sm ms-auto">View Bills</a>
+                        <a class="btn btn-primary btn-sm ms-auto" onclick="history.back()">Back</a>
                     </div>
                 </div>
 
                 <div class="card-body p-4">
                     <form method="post">
-                        <div class="form-group">
+                    <div class="form-group">
                             <label for="patient_id">Select Patient:</label>
-                            <select name="patient_id" class="form-control" required>
-                                <?php foreach ($patients as $patient): ?>
-                                    <option value="<?php echo $patient['patient_id']; ?>">
-                                        <?php echo htmlspecialchars($patient['first_name'] . " " . $patient['last_name']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+                            <?php if (!empty($patient_id)): ?>
+                                <!-- Prefilled input for patient_id -->
+                                <input type="hidden" name="patient_id" value="<?php echo htmlspecialchars($patient_id); ?>">
+                                <input type="text" class="form-control" value="<?php echo htmlspecialchars($Fcall->getPatientNameById($patient_id)); ?>" readonly>
+                            <?php else: ?>
+                                <!-- Dropdown for selecting a patient -->
+                                <select name="patient_id" class="form-control" required>
+                                    <option value="">Select a Patient</option>
+                                    <?php foreach ($patients as $patient): ?>
+                                        <option value="<?php echo $patient['patient_id']; ?>">
+                                            <?php echo htmlspecialchars($patient['first_name'] . " " . $patient['last_name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            <?php endif; ?>
                         </div>
-                        
                         <div class="form-group">
                             <label for="service_ids">Select Services:</label>
                             <div class="service-options">

@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['paid_amount'])) {
             <div class="card">
                 <div class="card-header pb-0">
                     <p class="mb-0">Manage Payment for Bill ID: <?php echo htmlspecialchars($bill_id); ?></p>
-                    <a href="?a=billing" class="btn btn-primary btn-sm ms-auto">Back to Bills</a>
+                    <a class="btn btn-primary btn-sm ms-auto" onclick="history.back()">Back</a>
                 </div>
 
                 <div class="card-body p-4">

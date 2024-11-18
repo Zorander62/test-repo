@@ -4,7 +4,7 @@
 // Fetch medications for the dropdown
 $medications = $Fcall->getMedications();
 $data =  $Fcall->Targeted_info('doctors','email',$_SESSION['username']);
-$docid = $data['doctor_id'];
+@$docid = $data['doctor_id'];
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -40,7 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="card-header pb-0">
                     <div class="d-flex align-items-center">
                         <p class="mb-0">New Prescription</p>
-                        <a href="?a=manage_prescription" class="btn btn-primary btn-sm ms-auto">View Prescription</a>
+                        <!-- <a href="?a=manage_prescription" class="btn btn-primary btn-sm ms-auto">View Prescription</a> -->
+                        <a class="btn btn-primary btn-sm ms-auto" onclick="history.back()">Back</a>
                     </div>
                 </div>
                 <div class="card-body p-4">

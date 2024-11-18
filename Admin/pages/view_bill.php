@@ -22,6 +22,7 @@ $due = $service['total_amount'] - $service['paid_amount'];
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
               <p class="mb-0">Billing Details for Patient</p>
+              <a class="btn btn-primary btn-sm ms-auto" onclick="history.back()">Back</a>
               <?php 
               if($_SESSION['role'] == 'admin'){
 

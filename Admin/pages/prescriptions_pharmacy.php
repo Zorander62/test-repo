@@ -1,5 +1,5 @@
 <?php
-
+$patient_idn = isset($_GET['id']) ? $_GET['id'] : '';
 if (isset($_POST['delete'])) {
     $prescription_id = $_POST['prescription_id'];
     if ($Fcall->deletePrescription($prescription_id)) {
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete'])) {
     }
 }
 // Assuming the `Prescriptions` table and related model or function is already set up
-$prescriptions = $Fcall->getAllPrescriptions(); // Get all prescriptions from the database
+$prescriptions = $Fcall->getAllPrescriptionsNeId($patient_idn); // Get all prescriptions from the database
 ?>
 
 <div class="container-fluid py-4">

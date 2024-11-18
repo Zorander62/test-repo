@@ -216,22 +216,30 @@ switch ($action) {
                                 require_once 'pages/manage_samples.php';
                                 break;
 
-                          
                                 case 'result':
                                     require_once 'pages/result.php';
                                     break;
                             
-                                case 'view_results':
-                                    require_once 'pages/view_results.php';
-                                    break;
-
-                                    case 'generate_report':
-                                        require_once 'pages/generate_report.php';
+                                    case 'view_results':
+                                        require_once 'pages/view_results.php';
                                         break;
-                          
-                                        case 'edit_test':
-                                            require_once 'pages/edit_test.php';
+
+                                        case 'generate_report':
+                                            require_once 'pages/generate_report.php';
                                             break;
+                            
+                                            case 'edit_test':
+                                                require_once 'pages/edit_test.php';
+                                                break;
+
+                                                    case 'patient_search':
+                                                        require_once 'pages/patient_search.php';
+                                                        break;
+
+                                                            case 'view_patient':
+                                                                require_once 'pages/view_patient.php';
+                                                                break;
+                                            
                       
                      
 
@@ -247,7 +255,7 @@ switch ($action) {
     // Set default pages based on role
     switch ($role) {
         case 'admin':
-            require_once 'pages/admin_dashboard.php';
+            require_once 'pages/dashboard.php';
             break;
         case 'doctor':
             require_once 'pages/doctor_dashboard.php';
